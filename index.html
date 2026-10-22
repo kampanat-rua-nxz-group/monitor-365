@@ -3,185 +3,341 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>PR Monitor</title>
 <style>
 :root {
-  --bg: #f4f5f7; --panel: #ffffff; --panel-2: #ebecf0; --text: #172b4d; --muted: #5e6c84;
-  --border: #dfe1e6; --accent: #0c66e4; --accent-soft: #e9f2ff;
-  --ok: #1f845a; --ok-soft: #dcfff1; --warn: #a54800; --warn-soft: #fff7d6;
-  --danger: #c9372c; --danger-soft: #ffeceb; --purple: #6e5dc6; --purple-soft: #f3f0ff;
-  --fire: #e2483d; --shadow: 0 1px 2px rgba(9,30,66,.2);
+  --case: #1b201b; --case-2: #262c25; --case-3: #303730; --case-line: #3a4238; --case-text: #eef1ea; --case-muted: #a9b2a4;
+  --ground: #e7eae2; --lane: #dce0d5; --card: #fbfcf9; --line: #c9cfc1; --line-soft: #e0e4da;
+  --text: #1a1f19; --muted: #556050; --faint: #6f7a6a;
+  --you: #f2b632; --you-ink: #2a1f05; --you-soft: #fbe9bd;
+  --them: #3f6f34; --them-soft: #d5e3cb; --them-ink: #21401a;
+  --flag: #c23b2a; --flag-soft: #f6dcd6;
+  --ok: #2f7a3b; --bad: #b3372a; --warn: #8a5e00;
+  --shadow: 0 1px 2px rgba(20, 28, 18, .07), 0 2px 8px rgba(20, 28, 18, .05);
+  --shadow-lg: 0 8px 32px rgba(15, 20, 14, .18), 0 2px 6px rgba(15, 20, 14, .08);
+  --r: 6px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1d2125; --panel: #22272b; --panel-2: #161a1d; --text: #dee4ea; --muted: #9fadbc;
-    --border: #38414a; --accent: #579dff; --accent-soft: #1c2b41;
-    --ok: #4bce97; --ok-soft: #1c3329; --warn: #f5cd47; --warn-soft: #332e1b;
-    --danger: #f87168; --danger-soft: #42221f; --purple: #9f8fef; --purple-soft: #2b273f;
-    --fire: #ff6b5e; --shadow: 0 1px 2px rgba(0,0,0,.5);
+    --case: #0e110e; --case-2: #1a1e19; --case-3: #232822; --case-line: #2c3329; --case-text: #e8ece3; --case-muted: #9aa494;
+    --ground: #151915; --lane: #1b201a; --card: #222821; --line: #343c32; --line-soft: #2a3128;
+    --text: #e4e8df; --muted: #a3ac9d; --faint: #8e9789;
+    --you: #f2b632; --you-ink: #231904; --you-soft: #3b3115;
+    --them: #86b977; --them-soft: #263a21; --them-ink: #c4e2b7;
+    --flag: #d9483a; --flag-soft: #3c201b;
+    --ok: #7cc585; --bad: #f08070; --warn: #e2b54a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .35);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, .55);
   }
 }
+
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--text); font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Thai", Roboto, sans-serif; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+body { background: var(--ground); color: var(--text); font: 14px/1.45 var(--font); -webkit-font-smoothing: antialiased; caret-color: var(--you); }
+::selection { background: var(--you-soft); color: var(--text); }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 button, input, select { font: inherit; color: inherit; }
-button { cursor: pointer; border: 1px solid var(--border); background: var(--panel); border-radius: 6px; padding: 6px 12px; }
-button:hover { border-color: var(--accent); }
-button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-input[type=text], input[type=password], input[type=number], select {
-  border: 1px solid var(--border); background: var(--panel); border-radius: 6px; padding: 6px 8px; min-width: 0;
-}
+h1, h2, h3, h4 { margin: 0; font-weight: 600; }
+.num, time, .t { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid var(--you); outline-offset: 2px; border-radius: 4px; }
+* { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.ic { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.ic.sm { width: 14px; height: 14px; }
+.ic.lg { width: 20px; height: 20px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-header h1 { font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px; }
-header .spacer { flex: 1; }
-header .me { display: flex; align-items: center; gap: 6px; color: var(--muted); }
-.status-line { color: var(--muted); font-size: 12px; }
-
-.toolbar { display: flex; gap: 8px; padding: 10px 16px; flex-wrap: wrap; align-items: center; }
-.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--border); font-size: 13px; white-space: nowrap; }
-.chip b { font-variant-numeric: tabular-nums; }
-button.chip.active { background: var(--accent-soft); border-color: var(--accent); }
-.chip.fire b { color: var(--fire); }
-.chip.danger b { color: var(--danger); }
-.toolbar .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-left: auto; }
-.toolbar label { display: inline-flex; gap: 4px; align-items: center; font-size: 13px; }
-
-.banner { margin: 0 16px 10px; padding: 8px 12px; border-radius: 6px; font-size: 13px; }
-.banner.error { background: var(--danger-soft); color: var(--danger); }
-.banner.warn { background: var(--warn-soft); color: var(--warn); }
-
-.board-wrap { overflow-x: auto; padding: 0 16px 24px; scroll-snap-type: x proximity; }
-.board { display: grid; gap: 0 10px; min-width: min-content; }
-.lane-head { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 6px 0; scroll-snap-align: start; }
-.lane-head .inner { background: var(--panel-2); border-radius: 6px 6px 0 0; padding: 8px 10px; border-top: 3px solid var(--lane-color, var(--border)); }
-.lane-head .t { font-weight: 600; display: flex; justify-content: space-between; gap: 6px; }
-.lane-head .d { font-size: 11px; color: var(--muted); }
-.swim-head { grid-column: 1 / -1; padding: 12px 0 6px; font-weight: 600; color: var(--muted); }
-.swim-head span { position: sticky; left: 0; }
-.cell { background: var(--panel-2); padding: 6px; display: flex; flex-direction: column; gap: 8px; min-height: 60px; border-radius: 0 0 6px 6px; }
-.cell.empty::after { content: "—"; color: var(--muted); text-align: center; font-size: 12px; padding: 12px 0; }
-
-.card { background: var(--panel); border-radius: 6px; box-shadow: var(--shadow); padding: 10px; cursor: pointer; border-left: 3px solid transparent; display: flex; flex-direction: column; gap: 6px; }
-.card:hover { outline: 1px solid var(--accent); }
-.card.turn-me { border-left-color: var(--fire); }
-.card .top { display: flex; justify-content: space-between; gap: 6px; font-size: 12px; color: var(--muted); }
-.card .repo { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card .title { font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
-.tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; background: var(--panel-2); color: var(--muted); }
-.tag.mine { background: var(--accent-soft); color: var(--accent); }
-.tag.review { background: var(--purple-soft); color: var(--purple); }
-.turn { font-size: 12px; color: var(--muted); }
-.turn.me { color: var(--fire); font-weight: 600; }
-.meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--muted); align-items: center; }
-.age { padding: 1px 6px; border-radius: 4px; background: var(--panel-2); font-variant-numeric: tabular-nums; }
-.age.warn { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
-.age.danger { background: var(--danger-soft); color: var(--danger); font-weight: 600; }
-.ok { color: var(--ok); } .bad { color: var(--danger); } .pending { color: var(--warn); }
-.reviewers { display: flex; flex-wrap: wrap; gap: 4px; }
-.rv { position: relative; display: inline-flex; }
-.rv img, .avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--panel-2); display: block; }
-.rv .st { position: absolute; right: -4px; bottom: -4px; font-size: 10px; line-height: 1; background: var(--panel); border-radius: 50%; padding: 1px; }
-.team { font-size: 11px; padding: 2px 6px; border: 1px dashed var(--border); border-radius: 999px; color: var(--muted); }
-
-.empty-state { max-width: 560px; margin: 40px auto; background: var(--panel); padding: 24px; border-radius: 8px; box-shadow: var(--shadow); }
-.empty-state h2 { margin-top: 0; }
-.empty-state .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
-
-dialog { border: none; border-radius: 10px; padding: 0; background: var(--panel); color: var(--text); width: min(720px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-shadow: 0 8px 32px rgba(0,0,0,.35); }
-dialog::backdrop { background: rgba(9,30,66,.5); }
-.dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 16px 16px 8px; position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--border); }
-.dlg-head h3 { margin: 0; font-size: 16px; }
-.dlg-body { padding: 12px 16px 16px; }
-.dlg-body h4 { margin: 16px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
-.facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 13px; }
-.facts dt { color: var(--muted); }
-.facts dd { margin: 0; }
-.list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
-.list li { display: flex; gap: 8px; align-items: flex-start; padding: 8px; background: var(--panel-2); border-radius: 6px; font-size: 13px; }
-.list li .grow { flex: 1; min-width: 0; }
-.snippet { color: var(--muted); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.form { display: grid; gap: 12px; }
-.form label { display: grid; gap: 4px; font-size: 13px; }
-.form .hint { color: var(--muted); font-size: 12px; }
-.form .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.form .check { display: flex; gap: 8px; align-items: center; }
-.dlg-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); position: sticky; bottom: 0; background: var(--panel); }
-.spin { display: inline-block; animation: spin 1s linear infinite; }
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: var(--r); border: 1px solid var(--line); background: var(--card); cursor: pointer; font-weight: 500; transition: background .15s, border-color .15s; white-space: nowrap; }
+.btn:hover { border-color: var(--faint); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.primary { background: var(--case); border-color: var(--case); color: var(--case-text); }
+.btn.primary:hover { background: var(--case-3); }
+.btn.ghost { background: transparent; border-color: transparent; }
+.btn.ghost:hover { background: var(--line-soft); }
+.btn.icon { width: 32px; padding: 0; justify-content: center; }
+.case .btn { background: transparent; border-color: var(--case-line); color: var(--case-text); }
+.case .btn:hover { background: var(--case-2); border-color: var(--case-muted); }
+.spinning .ic { animation: spin .9s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-@media (max-width: 640px) {
-  header, .toolbar { padding-left: 12px; padding-right: 12px; }
+/* Header + Your move rail (the clock case) */
+.case { background: var(--case); color: var(--case-text); }
+.bar { display: flex; align-items: center; gap: 16px; height: 56px; padding: 0 20px; }
+.brand { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.brand .ic { width: 22px; height: 22px; color: var(--you); }
+.status { color: var(--case-muted); font-size: 12px; }
+.demo-pill { font-size: 12px; color: var(--you); border: 1px solid color-mix(in srgb, var(--you) 45%, transparent); border-radius: 999px; padding: 2px 10px; }
+.bar .spacer { flex: 1; }
+.me { display: flex; align-items: center; gap: 8px; color: var(--case-muted); font-size: 13px; }
+.avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--case-3); display: block; }
+
+.rail { padding: 6px 20px 20px; }
+.rail-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.move-n { font-size: 40px; line-height: 1; font-weight: 600; color: var(--you); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.move-n.zero { color: var(--case-muted); }
+.move-l { font-size: 15px; font-weight: 600; }
+.move-sub { color: var(--case-muted); font-size: 13px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+.tile { display: flex; align-items: center; gap: 12px; text-align: left; padding: 10px 10px 10px 12px; border-radius: var(--r); background: var(--case-2); border: 1px solid var(--case-line); color: var(--case-text); cursor: pointer; min-width: 0; transition: border-color .15s, background .15s; }
+.tile:hover { border-color: var(--case-muted); background: var(--case-3); }
+.tile[aria-current="true"] { border-color: var(--you); }
+.tile-main { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.tile .ref { font-size: 12px; color: var(--case-muted); }
+.tile-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.verb { font-size: 12px; color: var(--you); font-weight: 500; }
+.tile-clock { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 4px; background: var(--you); color: var(--you-ink); font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tile-clock.danger { background: var(--flag); color: #fff; }
+.tile-clock.danger .ic { fill: currentColor; }
+.tile-more { color: var(--case-muted); font-size: 13px; align-self: center; padding: 0 4px; background: none; border: none; cursor: pointer; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.rail-empty { color: var(--case-muted); font-size: 14px; padding: 4px 0 2px; }
+
+/* Notices */
+.notice { display: flex; gap: 8px; align-items: flex-start; margin: 16px 20px 0; padding: 10px 12px; border-radius: var(--r); font-size: 13px; background: var(--flag-soft); color: var(--bad); }
+.notice.warn { background: var(--you-soft); color: var(--warn); }
+.notice .ic { margin-top: 1px; }
+
+/* Toolbar */
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 16px 20px 12px; }
+.seg { display: inline-flex; padding: 2px; border-radius: 7px; background: var(--lane); border: 1px solid var(--line-soft); }
+.seg button { height: 28px; padding: 0 12px; border: 0; border-radius: 5px; background: transparent; cursor: pointer; color: var(--muted); font-weight: 500; display: inline-flex; gap: 6px; align-items: center; }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
+.seg .num { color: var(--faint); font-size: 12px; }
+.toggle { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: var(--r); border: 1px solid var(--line); background: var(--card); cursor: pointer; font-weight: 500; color: var(--muted); }
+.toggle[aria-pressed="true"] { border-color: var(--flag); color: var(--flag); background: var(--flag-soft); }
+.toggle[aria-pressed="true"] .ic { fill: currentColor; }
+.toolbar .spacer { flex: 1; }
+.field { height: 32px; border-radius: var(--r); border: 1px solid var(--line); background: var(--card); padding: 0 10px; min-width: 0; }
+.field:hover { border-color: var(--faint); }
+.search { position: relative; display: inline-flex; align-items: center; }
+.search .ic { position: absolute; left: 9px; color: var(--faint); pointer-events: none; }
+.search input { padding-left: 30px; width: 220px; }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.check input { accent-color: var(--them); width: 15px; height: 15px; margin: 0; }
+
+/* Board */
+.board-wrap { overflow-x: auto; padding: 0 20px 32px; scroll-snap-type: x proximity; }
+.board { display: grid; gap: 0 8px; min-width: min-content; }
+.lane-head { position: sticky; top: 0; z-index: 2; background: var(--ground); padding-top: 4px; scroll-snap-align: start; }
+.lane-head .inner { background: var(--lane); border-radius: var(--r) var(--r) 0 0; padding: 10px 12px 8px; }
+.lane-head .t { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-weight: 600; font-size: 13px; }
+.lane-head .t .num { color: var(--faint); font-weight: 500; }
+.lane-head .d { font-size: 12px; color: var(--faint); }
+.swim-head { grid-column: 1 / -1; padding: 20px 0 8px; }
+.swim-head span { position: sticky; left: 0; font-weight: 600; font-size: 14px; }
+.swim-head .num { color: var(--faint); font-weight: 500; margin-left: 6px; }
+.cell { background: var(--lane); padding: 4px 8px 8px; display: flex; flex-direction: column; gap: 8px; min-height: 64px; border-radius: 0 0 var(--r) var(--r); }
+.swim-head + .cell, .swim-head ~ .cell { border-radius: var(--r); }
+.cell-empty { color: var(--faint); font-size: 12px; text-align: center; padding: 18px 0; }
+
+/* Card */
+.card { background: var(--card); border: 1px solid var(--line-soft); border-radius: var(--r); box-shadow: var(--shadow); padding: 10px 12px 10px; display: grid; gap: 8px; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.card:hover { border-color: var(--line); }
+.card[aria-current="true"] { border-color: var(--them); box-shadow: 0 0 0 1px var(--them), var(--shadow); }
+.card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: var(--faint); min-width: 0; }
+.ref { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ref b { font-weight: 500; color: var(--muted); margin-left: 4px; }
+.by { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.by img { width: 16px; height: 16px; border-radius: 50%; }
+.card-title { font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--faint); }
+.meta > span { display: inline-flex; align-items: center; gap: 4px; }
+.meta .ok { color: var(--ok); } .meta .bad, .bad { color: var(--bad); } .meta .warn { color: var(--warn); }
+.add { color: var(--ok); } .del { color: var(--bad); }
+.rvs { margin-left: auto; display: inline-flex; align-items: center; }
+.rv { position: relative; display: inline-flex; margin-left: -4px; }
+.rv:first-child { margin-left: 0; }
+.rv img { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--card); background: var(--lane); display: block; }
+.rv .st { position: absolute; right: -3px; bottom: -3px; width: 12px; height: 12px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--card); }
+.rv .st .ic { width: 8px; height: 8px; stroke-width: 3; }
+.st.APPROVED { background: var(--ok); color: #fff; }
+.st.CHANGES_REQUESTED { background: var(--bad); color: #fff; }
+.st.COMMENTED, .st.DISMISSED { background: var(--faint); color: #fff; }
+.st.PENDING { background: var(--card); border-color: var(--warn) !important; }
+.team { font-size: 11px; color: var(--muted); border: 1px dashed var(--line); border-radius: 999px; padding: 1px 6px; margin-left: 4px; }
+
+/* The chess clock */
+.clock { display: flex; height: 30px; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; font-size: 12px; background: var(--card); }
+.clock .face { flex: 1 1 auto; display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 0 8px; min-width: 0; color: var(--faint); transition: background .2s, color .2s; }
+.clock .face.you { flex-shrink: 0; }
+.clock .face + .face { border-left: 1px solid var(--line); }
+.clock .who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.clock .t { flex: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; font-size: 13px; white-space: nowrap; }
+.clock .face.lit.you { background: var(--you); color: var(--you-ink); }
+.clock .face.lit.them { background: var(--them-soft); color: var(--them-ink); }
+.clock .face.lit .who { font-weight: 500; }
+.clock .face.lit.warn .t .ic { color: currentColor; }
+.clock .face.lit.danger { background: var(--flag); color: #fff; }
+.clock .face.lit.danger .t .ic { fill: currentColor; }
+.clock.stopped { background: transparent; border-style: dashed; }
+.clock.stopped .face { justify-content: flex-start; }
+.clock.stopped .face .t { margin-left: auto; font-weight: 500; font-size: 12px; }
+.clock.lg { height: 44px; font-size: 13px; }
+.clock.lg .t { font-size: 18px; }
+.clock.lg .face { padding: 0 12px; }
+
+/* Skeleton */
+.sk { background: var(--card); border-radius: var(--r); height: 108px; border: 1px solid var(--line-soft); animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .55; } }
+
+/* Inspector */
+.inspector { position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100vw); background: var(--card); border-left: 1px solid var(--line); box-shadow: var(--shadow-lg); z-index: 20; overflow-y: auto; transform: translateX(100%); visibility: hidden; transition: transform .22s cubic-bezier(.16, 1, .3, 1), visibility 0s .22s; }
+.inspector.open { transform: none; visibility: visible; transition: transform .22s cubic-bezier(.16, 1, .3, 1); }
+@media (min-width: 1200px) { body.inspecting main { padding-right: 440px; } }
+.insp-head { position: sticky; top: 0; background: var(--card); padding: 14px 16px 12px; border-bottom: 1px solid var(--line-soft); display: grid; gap: 6px; z-index: 1; }
+.insp-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--faint); }
+.insp-title { font-size: 17px; line-height: 1.3; }
+.insp-title a { text-decoration: none; }
+.insp-title a:hover { text-decoration: underline; }
+.insp-body { padding: 14px 16px 24px; display: grid; gap: 20px; }
+.insp-body h4 { font-size: 13px; margin-bottom: 8px; display: flex; gap: 6px; align-items: baseline; }
+.insp-body h4 .num { color: var(--faint); font-weight: 500; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; font-size: 13px; }
+.facts dt { color: var(--faint); }
+.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.facts code { font: 12px var(--mono); background: var(--lane); padding: 1px 5px; border-radius: 4px; }
+.list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); border-radius: var(--r); overflow: hidden; }
+.list li { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: var(--card); font-size: 13px; }
+.list li .grow { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.list img { width: 24px; height: 24px; border-radius: 50%; flex: none; }
+.list .sub { color: var(--faint); font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.list .body { color: var(--muted); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.list code { font: 12px var(--mono); color: var(--muted); }
+.list a { color: var(--them); font-weight: 500; }
+.pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 1px 6px; border-radius: 999px; background: var(--lane); color: var(--muted); }
+.pill.on-author { background: var(--you-soft); color: var(--warn); }
+.pill.on-reviewer { background: var(--them-soft); color: var(--them-ink); }
+.none { color: var(--faint); font-size: 13px; }
+.state-line { display: inline-flex; align-items: center; gap: 5px; }
+
+/* Welcome */
+.welcome { max-width: 560px; margin: 48px auto; padding: 0 20px; }
+.welcome h2 { font-size: 22px; letter-spacing: -.01em; margin-bottom: 8px; }
+.welcome p { color: var(--muted); margin: 0 0 12px; max-width: 65ch; }
+.welcome ol { color: var(--muted); padding-left: 20px; margin: 0 0 20px; display: grid; gap: 6px; }
+.welcome .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.empty-all { text-align: center; color: var(--muted); padding: 48px 20px; }
+
+/* Settings dialog */
+dialog { border: 1px solid var(--line); border-radius: 10px; padding: 0; background: var(--card); color: var(--text); width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-shadow: var(--shadow-lg); }
+dialog::backdrop { background: rgba(14, 17, 14, .45); }
+.dlg-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line-soft); }
+.dlg-head h3 { font-size: 16px; }
+.form { display: grid; gap: 16px; padding: 16px; }
+.form label { display: grid; gap: 6px; font-size: 13px; font-weight: 500; }
+.form .field { height: 36px; font-weight: 400; }
+.form .hint { color: var(--faint); font-size: 12px; font-weight: 400; }
+.form .hint a { color: var(--them); }
+.form .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+.form .check { font-size: 13px; font-weight: 400; color: var(--text); display: flex; align-items: flex-start; }
+.form .check input { margin-top: 2px; }
+.dlg-foot { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--line-soft); }
+.dlg-foot .spacer { flex: 1; }
+
+@media (max-width: 720px) {
+  .bar { padding: 0 12px; gap: 10px; }
+  .status, .me span, #demoPill { display: none; }
+  .rail { padding: 4px 12px 16px; }
+  .tiles { grid-template-columns: 1fr; }
+  .toolbar { padding: 12px 12px 8px; }
+  .search, .search input { width: 100%; }
+  .toolbar .spacer { display: none; }
   .board-wrap { padding: 0 12px 24px; }
-  .toolbar .filters { margin-left: 0; }
+  .notice { margin: 12px 12px 0; }
+  .form .row { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
 }
 </style>
 </head>
 <body>
-<header>
-  <h1>🗂️ PR Monitor</h1>
-  <span class="status-line" id="status"></span>
-  <span class="spacer"></span>
-  <span class="me" id="me"></span>
-  <button id="btnRefresh" title="Refresh (R)">⟳ Refresh</button>
-  <button id="btnSettings">⚙️ Settings</button>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-logo" viewBox="0 0 24 24"><rect x="2.5" y="8.5" width="19" height="12" rx="2"/><circle cx="8" cy="14.5" r="3"/><circle cx="16" cy="14.5" r="3"/><path d="M8 14.5v-1.6M16 14.5l1.2-1"/><path d="M6.5 8.5V6h3M15 8.5V7h3"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-comment" viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3.5V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 21V4"/><path d="M6 4h11l-2.5 4 2.5 4H6"/></symbol>
+  <symbol id="i-merge" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="13" r="2"/><path d="M6 7v10M6 7c0 4 4 6 10 6"/></symbol>
+  <symbol id="i-closed" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M9 9l6 6M15 9l-6 6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.2v.1"/></symbol>
+  <symbol id="i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="i-draft" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 7l3 3"/></symbol>
+  <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9"/></symbol>
+  <symbol id="i-team" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5a3 3 0 0 1 0 6M21 20c0-2.6-1.5-4.8-3.6-5.6"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M10 8L5 12l5 4"/><path d="M5 12h9a5 5 0 0 1 5 5v2"/></symbol>
+</svg>
+
+<header class="case">
+  <div class="bar">
+    <div class="brand"><svg class="ic"><use href="#i-logo"/></svg>PR Monitor</div>
+    <span class="status" id="status" aria-live="polite"></span>
+    <span id="demoPill"></span>
+    <span class="spacer"></span>
+    <span class="me" id="me"></span>
+    <button class="btn icon" id="btnRefresh" title="Refresh (R)" aria-label="Refresh"><svg class="ic"><use href="#i-refresh"/></svg></button>
+    <button class="btn" id="btnSettings"><svg class="ic"><use href="#i-settings"/></svg><span>Settings</span></button>
+  </div>
+  <section class="rail" id="rail" hidden aria-labelledby="railTitle"></section>
 </header>
 
-<div class="toolbar" id="toolbar" hidden>
-  <button class="chip fire" id="chipTurn" title="Show only PRs waiting on you">🔥 Your turn <b id="cTurn">0</b></button>
-  <span class="chip danger" title="PRs stuck in their current state longer than the 'stale' threshold">⚠️ Stale <b id="cStale">0</b></span>
-  <span class="chip">🧑‍💻 Mine <b id="cMine">0</b></span>
-  <span class="chip">👀 Reviewing <b id="cReview">0</b></span>
-  <div class="filters">
-    <select id="fRole" aria-label="role">
-      <option value="all">All PRs</option>
-      <option value="mine">My PRs</option>
-      <option value="review">PRs I review</option>
-    </select>
-    <select id="fRepo" aria-label="repo"><option value="">All repos</option></select>
-    <input type="text" id="fQ" placeholder="Search title / #number / person" size="18">
-    <label><input type="checkbox" id="fSwim"> Group by role</label>
+<main>
+  <div id="notices"></div>
+  <div class="toolbar" id="toolbar" hidden>
+    <div class="seg" role="group" aria-label="Show">
+      <button data-role="all" aria-pressed="true">All <span class="num" id="nAll"></span></button>
+      <button data-role="mine" aria-pressed="false">Mine <span class="num" id="nMine"></span></button>
+      <button data-role="review" aria-pressed="false">Reviewing <span class="num" id="nReview"></span></button>
+    </div>
+    <button class="toggle" id="fFlag" aria-pressed="false" title="Show only PRs past the stale threshold"><svg class="ic sm"><use href="#i-flag"/></svg><span>Flag fell</span> <span class="num" id="nFlag"></span></button>
+    <span class="spacer"></span>
+    <select class="field" id="fRepo" aria-label="Repository"><option value="">All repositories</option></select>
+    <label class="search"><svg class="ic sm"><use href="#i-search"/></svg><input class="field" type="search" id="fQ" placeholder="Search title, #, person" aria-label="Search"></label>
+    <label class="check"><input type="checkbox" id="fSwim"> Group by role</label>
   </div>
-</div>
+  <div id="board"></div>
+</main>
 
-<div id="banners"></div>
-<main id="main"></main>
-
-<dialog id="dlgPR"></dialog>
+<aside class="inspector" id="inspector" aria-label="Pull request details" tabindex="-1"></aside>
 
 <dialog id="dlgSettings">
   <form method="dialog" id="settingsForm">
-    <div class="dlg-head"><h3>⚙️ Settings</h3><button value="cancel" formnovalidate>✕</button></div>
-    <div class="dlg-body form">
-      <label>GitHub Personal Access Token
-        <input type="password" name="token" autocomplete="off" placeholder="ghp_... or github_pat_...">
+    <div class="dlg-head"><h3>Settings</h3><button class="btn ghost icon" value="cancel" formnovalidate aria-label="Close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="form">
+      <label>GitHub personal access token
+        <input class="field" type="password" name="token" autocomplete="off" placeholder="ghp_… or github_pat_…">
         <span class="hint">
-          Create one at <a href="https://github.com/settings/tokens/new?scopes=repo&description=PR%20Monitor" target="_blank" rel="noopener">github.com/settings/tokens</a>
-          (classic token, <code>repo</code> scope). If your org uses SSO, also click “Configure SSO” → Authorize.
-          <br>The token is stored only in this browser (localStorage) and is sent only to api.github.com.
+          <a href="https://github.com/settings/tokens/new?scopes=repo&description=PR%20Monitor" target="_blank" rel="noopener">Create a classic token</a> with the <code>repo</code> scope. If your org uses SSO, click Configure SSO → Authorize on the token.
+          Stored only in this browser and sent only to api.github.com.
         </span>
       </label>
-      <label>Extra filter (GitHub search qualifiers)
-        <input type="text" name="extraQuery" placeholder="e.g. org:my-company or repo:owner/name">
-        <span class="hint">Leave empty to include every repo the token can access</span>
+      <label>Extra search filter
+        <input class="field" type="text" name="extraQuery" placeholder="org:my-company">
+        <span class="hint">Any GitHub search qualifiers, such as <code>org:</code> or <code>repo:owner/name</code>. Leave empty for every repo the token can see.</span>
       </label>
       <div class="row">
-        <label>Warn (yellow) after (hours)<input type="number" name="warnHours" min="1"></label>
-        <label>Stale (red) after (hours)<input type="number" name="dangerHours" min="1"></label>
-        <label>Show Done for the last (days)<input type="number" name="doneDays" min="0" max="90"></label>
-        <label>Auto-refresh every (minutes, 0 = off)<input type="number" name="refreshMin" min="0"></label>
+        <label>Flag rises after (hours)<input class="field" type="number" name="warnHours" min="1"></label>
+        <label>Flag falls after (hours)<input class="field" type="number" name="dangerHours" min="1"></label>
+        <label>Show Done for (days)<input class="field" type="number" name="doneDays" min="0" max="90"></label>
+        <label>Auto-refresh every (min, 0 = off)<input class="field" type="number" name="refreshMin" min="0"></label>
       </div>
-      <label class="check"><input type="checkbox" name="includeAssigned"> Include PRs assigned to me (not only review requests)</label>
-      <label class="check"><input type="checkbox" name="ignoreBots"> Ignore reviews/comments from bots (e.g. Copilot, CodeRabbit) when picking lanes</label>
-      <label class="check"><input type="checkbox" name="notify"> Browser notification when a new PR is waiting on you</label>
+      <label class="check"><input type="checkbox" name="includeAssigned"> Include PRs assigned to me, not only review requests</label>
+      <label class="check"><input type="checkbox" name="ignoreBots"> Ignore bot reviews (Copilot, CodeRabbit…) when deciding whose turn it is</label>
+      <label class="check"><input type="checkbox" name="notify"> Notify me when a PR lands on my clock</label>
     </div>
     <div class="dlg-foot">
-      <button type="button" id="btnClearToken">Clear token</button>
-      <span class="spacer" style="flex:1"></span>
-      <button value="cancel" formnovalidate>Cancel</button>
-      <button value="save" class="primary">Save</button>
+      <button class="btn ghost" type="button" id="btnClearToken">Clear token</button>
+      <span class="spacer"></span>
+      <button class="btn" value="cancel" formnovalidate>Cancel</button>
+      <button class="btn primary" value="save">Save</button>
     </div>
   </form>
 </dialog>
@@ -192,16 +348,16 @@ dialog::backdrop { background: rgba(9,30,66,.5); }
 /* ---------- Config ---------- */
 
 const LANES = [
-  { id: 'draft',    title: '📝 Draft',               desc: 'Not ready for review yet',                  color: '#8590a2' },
-  { id: 'waiting',  title: '👀 Awaiting review',      desc: 'No review yet / waiting on reviewers',        color: '#579dff' },
-  { id: 'changes',  title: '🔧 Changes requested',   desc: 'Feedback not addressed yet',     color: '#f87168' },
-  { id: 'updated',  title: '🔁 Updated, re-review',  desc: 'Author updated after feedback',      color: '#9f8fef' },
-  { id: 'approved', title: '✅ Approved',             desc: 'Approved, ready to merge',          color: '#4bce97' },
-  { id: 'done',     title: '🎉 Done',                 desc: 'Recently merged / closed',               color: '#8590a2' },
+  { id: 'draft',    title: 'Draft',             desc: 'Not ready for review' },
+  { id: 'waiting',  title: 'Awaiting review',   desc: 'No review yet' },
+  { id: 'changes',  title: 'Changes requested', desc: 'Feedback not addressed yet' },
+  { id: 'updated',  title: 'Updated',           desc: 'Author responded' },
+  { id: 'approved', title: 'Approved',          desc: 'Ready to merge' },
+  { id: 'done',     title: 'Done',              desc: 'Merged or closed recently' },
 ];
 const SWIMLANES = [
-  { id: 'mine',   title: '🧑‍💻 My PRs' },
-  { id: 'review', title: '👀 PRs I need to review / have reviewed' },
+  { id: 'mine',   title: 'My PRs' },
+  { id: 'review', title: 'Reviewing' },
 ];
 const DEFAULTS = {
   token: '', extraQuery: '', warnHours: 24, dangerHours: 72, doneDays: 7, refreshMin: 5,
@@ -218,7 +374,7 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
 let settings = { ...DEFAULTS, ...store.get(SETTINGS_KEY, {}) };
-let ui = { role: 'all', repo: '', q: '', myTurn: false, swim: true, ...store.get(UI_KEY, {}) };
+let ui = { role: 'all', repo: '', q: '', flagged: false, swim: true, ...store.get(UI_KEY, {}) };
 let state = { me: null, prs: [], loading: false, error: null, warnings: [], demo: false, fetchedAt: null, rate: null };
 let knownTurnIds = null;
 let refreshTimer = null;
@@ -499,60 +655,107 @@ function analyze(n, me, src) {
   };
 }
 
+
 /* ---------- Rendering ---------- */
 
-const STATE_ICON = { APPROVED: '✅', CHANGES_REQUESTED: '❌', COMMENTED: '💬', DISMISSED: '🚫' };
-const STATE_TEXT = { APPROVED: 'Approved', CHANGES_REQUESTED: 'Changes requested', COMMENTED: 'Commented', DISMISSED: 'Dismissed' };
-const CI_ICON = { SUCCESS: ['✓', 'ok', 'CI passed'], FAILURE: ['✗', 'bad', 'CI failed'], ERROR: ['✗', 'bad', 'CI error'], PENDING: ['●', 'pending', 'CI running'], EXPECTED: ['●', 'pending', 'CI pending'] };
+const STATE_TEXT = { APPROVED: 'Approved', CHANGES_REQUESTED: 'Requested changes', COMMENTED: 'Commented', DISMISSED: 'Review dismissed' };
+const STATE_ICON = { APPROVED: 'check', CHANGES_REQUESTED: 'x', COMMENTED: 'comment', DISMISSED: 'x' };
+const CI = {
+  SUCCESS: ['check', 'ok', 'Checks passed'], FAILURE: ['x', 'bad', 'Checks failed'], ERROR: ['x', 'bad', 'Checks errored'],
+  PENDING: ['dot', 'warn', 'Checks running'], EXPECTED: ['dot', 'warn', 'Checks pending'],
+};
+let selectedId = null;
+let showAllTiles = false;
 
-function turnText(p) {
-  switch (p.turn) {
-    case 'me': return `🔥 Your turn${p.hint ? ' · ' + p.hint : ''}`;
-    case 'author': return `⏳ Waiting on @${p.author} ${p.hint || 'to make changes'}`;
-    case 'reviewers': return '⏳ Waiting on reviewers';
-    case 'others': return `⏳ Waiting on other reviewers · ${p.hint}`;
-    case 'draft': return p.isMine ? '✏️ Your draft' : `✏️ @${p.author} still working on it`;
-    default: return p.state === 'MERGED' ? '🟣 Merged' : '⚪ Closed';
-  }
+const ic = (name, cls = '') => `<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+const pad2 = (n) => String(n).padStart(2, '0');
+function fmtClock(ms) {
+  const m = Math.max(0, Math.floor(ms / 60000));
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ${pad2(m % 60)}m`;
+  return `${Math.floor(h / 24)}d ${pad2(h % 24)}h`;
 }
+const waitOf = (p) => Date.now() - p.since;
+const isOpen = (p) => p.lane !== 'done';
+const isFlagged = (p) => isOpen(p) && p.lane !== 'draft' && staleLevel(waitOf(p)) === 'danger';
+const shortRepo = (r) => r.split('/').pop();
 function avatarImg(src, login, cls = '') {
-  return `<img class="${cls}" src="${esc(src || '')}" alt="${esc(login)}" title="${esc(login)}" loading="lazy" onerror="this.style.visibility='hidden'">`;
+  return `<img class="${cls}" src="${esc(src || '')}" alt="" title="${esc(login)}" loading="lazy" onerror="this.style.visibility='hidden'">`;
 }
-function reviewerChips(p) {
-  const chips = p.reviewers.map((r) => {
-    const icon = r.pending ? '⏳' : STATE_ICON[r.state] || '';
-    const label = `${r.login}: ${r.pending ? 'review pending' : STATE_TEXT[r.state] || ''}${r.bot ? ' (bot)' : ''}`;
-    return `<span class="rv" title="${esc(label)}">${avatarImg(r.avatar, label)}<span class="st">${icon}</span></span>`;
+
+function verbFor(p) {
+  if (p.isMine) return p.lane === 'approved' ? 'Merge' : 'Address feedback';
+  if (p.lane === 'updated') return 'Re-review';
+  if (/commented/.test(p.hint)) return 'Approve or follow up';
+  return 'Review';
+}
+function themLabel(p) {
+  if (!p.isMine) return p.turn === 'others' ? 'Others' : `@${p.author}`;
+  const pending = p.reviewers.filter((r) => r.pending && !(settings.ignoreBots && r.bot));
+  if (pending.length === 1 && !p.teams.length) return `@${pending[0].login}`;
+  if (!pending.length && p.teams.length === 1) return `@${p.teams[0]}`;
+  return 'Reviewers';
+}
+function turnSentence(p) {
+  if (p.lane === 'done') return p.state === 'MERGED' ? 'Merged' : 'Closed';
+  if (p.lane === 'draft') return p.isMine ? 'Your draft' : `@${p.author} is still drafting`;
+  if (p.turn === 'me') return `Your move: ${verbFor(p).toLowerCase()}`;
+  if (p.turn === 'others') return 'You approved; waiting on other reviewers';
+  if (p.turn === 'author') return `Waiting on @${p.author} to address ${p.isMine ? 'feedback' : 'your review'}`;
+  return `Waiting on ${themLabel(p)}`;
+}
+
+function clockHTML(p, size = '') {
+  if (p.lane === 'done') {
+    return `<div class="clock stopped ${size}"><span class="face">${ic(p.state === 'MERGED' ? 'merge' : 'closed', 'sm')}<span class="who">${p.state === 'MERGED' ? 'Merged' : 'Closed'}</span><span class="t">${ago(p.closedAt)}</span></span></div>`;
+  }
+  if (p.lane === 'draft') {
+    return `<div class="clock stopped ${size}"><span class="face">${ic('draft', 'sm')}<span class="who">Draft</span><span class="t" title="Opened ${esc(fmtDate(p.createdAt))}">${fmtDur(Date.now() - p.createdAt)} old</span></span></div>`;
+  }
+  const lit = p.turn === 'me' ? 'you' : 'them';
+  const lvl = staleLevel(waitOf(p));
+  const them = themLabel(p);
+  const flag = lvl ? ic('flag', 'sm') : '';
+  const face = (side, label) => {
+    const on = side === lit;
+    return `<span class="face ${side}${on ? ` lit ${lvl}` : ''}"><span class="who">${esc(label)}</span>${on ? `<span class="t">${flag}${fmtClock(waitOf(p))}</span>` : ''}</span>`;
+  };
+  const aria = `${lit === 'you' ? 'Your move' : `Waiting on ${them}`} for ${fmtDur(waitOf(p))}${lvl === 'danger' ? ', overdue' : ''}`;
+  return `<div class="clock ${size}" role="img" aria-label="${esc(aria)}">${face('you', 'You')}${face('them', them)}</div>`;
+}
+
+function reviewerAvatars(p) {
+  const out = p.reviewers.slice(0, 5).map((r) => {
+    const st = r.pending ? 'PENDING' : r.state;
+    const label = `${r.login}: ${r.pending ? 'review requested' : STATE_TEXT[r.state] || ''}${r.bot ? ' (bot)' : ''}`;
+    const badge = st === 'PENDING' ? '' : ic(STATE_ICON[st] || 'dot');
+    return `<span class="rv" title="${esc(label)}">${avatarImg(r.avatar, label)}<span class="st ${st}">${badge}</span></span>`;
   });
-  chips.push(...p.teams.map((t) => `<span class="team" title="Waiting on team ${esc(t)}">⏳ @${esc(t)}</span>`));
-  return chips.join('');
+  if (p.reviewers.length > 5) out.push(`<span class="team">+${p.reviewers.length - 5}</span>`);
+  out.push(...p.teams.map((t) => `<span class="team" title="Review requested from team ${esc(t)}">@${esc(t)}</span>`));
+  return out.join('');
+}
+
+function metaHTML(p) {
+  const m = [];
+  if (p.counted) {
+    const done = p.counted - p.unresolved;
+    m.push(`<span class="${p.unresolved ? '' : 'ok'}" title="${done} of ${p.counted} review threads resolved">${ic('comment', 'sm')}${done}/${p.counted}</span>`);
+  }
+  if (p.ci && CI[p.ci]) { const [i, c, t] = CI[p.ci]; m.push(`<span class="${c}" title="${t}">${ic(i, 'sm')}CI</span>`); }
+  if (p.mergeable === 'CONFLICTING' && isOpen(p)) m.push(`<span class="bad" title="Merge conflict">${ic('alert', 'sm')}Conflict</span>`);
+  m.push(`<span class="num" title="Lines changed"><span class="add">+${p.additions ?? 0}</span><span class="del">−${p.deletions ?? 0}</span></span>`);
+  return m.join('');
 }
 
 function cardHTML(p) {
-  const now = Date.now();
-  const open = p.lane !== 'done';
-  const waited = now - p.since;
-  const lvl = open && p.turn !== 'draft' ? staleLevel(waited) : '';
-  const ageLabel = p.lane === 'done'
-    ? `${p.state === 'MERGED' ? 'merged' : 'closed'} ${ago(p.closedAt)}`
-    : p.lane === 'draft' ? `open ${fmtDur(now - p.createdAt)}` : `waiting ${fmtDur(waited)}`;
-  const meta = [`<span class="age ${lvl}" title="In this state since ${esc(fmtDate(p.since))}">⏱ ${ageLabel}</span>`];
-  if (open && p.lane !== 'draft') meta.push(`<span title="Total time open">📅 ${fmtDur(now - p.createdAt)}</span>`);
-  if (p.counted) {
-    const done = p.counted - p.unresolved;
-    meta.push(`<span class="${p.unresolved ? 'pending' : 'ok'}" title="Resolved / total review threads">💬 ${done}/${p.counted} resolved</span>`);
-  }
-  if (p.ci && CI_ICON[p.ci]) { const [i, c, t] = CI_ICON[p.ci]; meta.push(`<span class="${c}" title="${t}">${i} CI</span>`); }
-  if (p.mergeable === 'CONFLICTING' && open) meta.push('<span class="bad" title="Has merge conflicts">⚠ conflict</span>');
-  meta.push(`<span title="Lines changed"><span class="ok">+${p.additions ?? 0}</span> <span class="bad">−${p.deletions ?? 0}</span></span>`);
-
-  return `<article class="card ${p.turn === 'me' ? 'turn-me' : ''}" data-id="${esc(p.id)}" tabindex="0">
-    <div class="top"><span class="repo" title="${esc(p.repo)}">${esc(p.repo)} #${p.number}</span>
-      <span class="tag ${p.role}">${p.isMine ? 'mine' : '@' + esc(p.author)}</span></div>
-    <div class="title">${esc(p.title)}</div>
-    <div class="turn ${p.turn === 'me' ? 'me' : ''}">${esc(turnText(p))}</div>
-    <div class="meta">${meta.join('')}</div>
-    ${p.reviewers.length || p.teams.length ? `<div class="reviewers">${reviewerChips(p)}</div>` : ''}
+  return `<article class="card" data-id="${esc(p.id)}" tabindex="0" aria-current="${p.id === selectedId}" aria-label="${esc(`${p.repo} #${p.number}: ${p.title}. ${turnSentence(p)}`)}">
+    <div class="card-top"><span class="ref" title="${esc(p.repo)}">${esc(shortRepo(p.repo))}<b>#${p.number}</b></span>
+      ${p.isMine ? '' : `<span class="by">${avatarImg(p.authorAvatar, p.author)}@${esc(p.author)}</span>`}</div>
+    <h3 class="card-title">${esc(p.title)}</h3>
+    ${clockHTML(p)}
+    <div class="meta">${metaHTML(p)}<span class="rvs">${reviewerAvatars(p)}</span></div>
   </article>`;
 }
 
@@ -560,7 +763,7 @@ function sortCards(a, b) {
   const ta = a.turn === 'me' ? 0 : 1, tb = b.turn === 'me' ? 0 : 1;
   if (ta !== tb) return ta - tb;
   if (a.lane === 'done') return b.closedAt - a.closedAt;
-  return a.since - b.since; // waiting longest first
+  return a.since - b.since; // longest wait first
 }
 
 function filtered() {
@@ -568,7 +771,7 @@ function filtered() {
   return state.prs.filter((p) => {
     if (ui.role !== 'all' && p.role !== ui.role) return false;
     if (ui.repo && p.repo !== ui.repo) return false;
-    if (ui.myTurn && p.turn !== 'me') return false;
+    if (ui.flagged && !isFlagged(p)) return false;
     if (q) {
       const hay = `${p.title} #${p.number} ${p.repo} ${p.author} ${p.reviewers.map((r) => r.login).join(' ')}`.toLowerCase();
       if (!hay.includes(q)) return false;
@@ -579,123 +782,192 @@ function filtered() {
 
 function render() {
   renderHeader();
-  renderBanners();
-  const main = $('#main');
+  renderNotices();
+  const board = $('#board'), rail = $('#rail'), toolbar = $('#toolbar');
   if (!settings.token && !state.demo) {
-    $('#toolbar').hidden = true;
-    main.innerHTML = `<div class="empty-state">
-      <h2>👋 Welcome to PR Monitor</h2>
-      <p>A board for tracking GitHub pull requests you <b>authored</b> or were <b>asked to review</b>, grouped into lanes by status.
-      Each card shows <b>whose turn it is</b>, how many comments are resolved, and <b>how long it has been waiting</b>.</p>
-      <p>Get started by adding a GitHub Personal Access Token (<code>repo</code> scope).</p>
-      <div class="actions"><button class="primary" data-act="settings">Set token</button><button data-act="demo">Try the demo</button></div>
-    </div>`;
+    rail.hidden = true; toolbar.hidden = true;
+    board.innerHTML = `<section class="welcome">
+      <h2>See whose move it is on every pull request</h2>
+      <p>PR Monitor lists the GitHub pull requests you opened or were asked to review, sorts them by review state, and runs a clock on whoever needs to act next.</p>
+      <ol>
+        <li><a href="https://github.com/settings/tokens/new?scopes=repo&description=PR%20Monitor" target="_blank" rel="noopener">Create a classic token</a> with the <code>repo</code> scope.</li>
+        <li>Paste it in Settings. It stays in this browser.</li>
+      </ol>
+      <div class="actions"><button class="btn primary" data-act="settings">Add token</button><button class="btn" data-act="demo">Try with demo data</button></div>
+    </section>`;
+    renderInspector();
     return;
   }
-  $('#toolbar').hidden = false;
-  if (!state.prs.length && state.loading) { main.innerHTML = '<div class="empty-state"><span class="spin">⟳</span> Loading PRs...</div>'; return; }
+  toolbar.hidden = false;
+  renderRail();
+  renderToolbar();
 
+  if (!state.prs.length && state.loading) {
+    board.innerHTML = boardHTML(LANES, [{ id: 'sk', title: null, prs: [] }], true);
+    return;
+  }
+  if (!state.prs.length && !state.error) {
+    board.innerHTML = '<div class="empty-all">No open pull requests involve you right now.</div>';
+    renderInspector();
+    return;
+  }
   const prs = filtered();
-  const all = state.prs;
-  $('#cTurn').textContent = all.filter((p) => p.turn === 'me').length;
-  $('#cStale').textContent = all.filter((p) => p.lane !== 'done' && p.turn !== 'draft' && staleLevel(Date.now() - p.since) === 'danger').length;
-  $('#cMine').textContent = all.filter((p) => p.isMine && p.lane !== 'done').length;
-  $('#cReview').textContent = all.filter((p) => !p.isMine && p.lane !== 'done').length;
-  $('#chipTurn').classList.toggle('active', ui.myTurn);
-
-  const repos = [...new Set(all.map((p) => p.repo))].sort();
-  const sel = $('#fRepo');
-  sel.innerHTML = '<option value="">All repos</option>' + repos.map((r) => `<option ${r === ui.repo ? 'selected' : ''}>${esc(r)}</option>`).join('');
-  $('#fRole').value = ui.role;
-  $('#fSwim').checked = ui.swim;
-  if ($('#fQ') !== document.activeElement) $('#fQ').value = ui.q;
-
   const lanes = LANES.filter((l) => l.id !== 'done' || settings.doneDays > 0 || state.demo);
   const rows = ui.swim
     ? SWIMLANES.filter((s) => ui.role === 'all' || ui.role === s.id).map((s) => ({ ...s, prs: prs.filter((p) => p.role === s.id) }))
     : [{ id: 'all', title: null, prs }];
+  board.innerHTML = boardHTML(lanes, rows, false, prs);
+  renderInspector();
+}
 
-  let html = `<div class="board-wrap"><div class="board" style="grid-template-columns: repeat(${lanes.length}, minmax(260px, 1fr))">`;
+function boardHTML(lanes, rows, skeleton, prs = []) {
+  let html = `<div class="board-wrap"><div class="board" style="grid-template-columns: repeat(${lanes.length}, minmax(212px, 1fr))">`;
   for (const l of lanes) {
     const n = prs.filter((p) => p.lane === l.id).length;
-    html += `<div class="lane-head" style="--lane-color:${l.color}"><div class="inner"><div class="t"><span>${l.title}</span><span>${n}</span></div><div class="d">${l.desc}</div></div></div>`;
+    html += `<div class="lane-head"><div class="inner"><div class="t"><span>${l.title}</span><span class="num">${skeleton ? '' : n}</span></div><div class="d">${l.desc}</div></div></div>`;
   }
   for (const row of rows) {
-    if (row.title) html += `<div class="swim-head"><span>${row.title} (${row.prs.filter((p) => p.lane !== 'done').length})</span></div>`;
+    if (row.title) html += `<div class="swim-head"><span>${row.title}<span class="num">${row.prs.filter(isOpen).length} open</span></span></div>`;
     for (const l of lanes) {
+      if (skeleton) { html += `<div class="cell"><div class="sk"></div>${l.id === 'waiting' || l.id === 'changes' ? '<div class="sk"></div>' : ''}</div>`; continue; }
       const cards = row.prs.filter((p) => p.lane === l.id).sort(sortCards);
-      html += `<div class="cell ${cards.length ? '' : 'empty'}">${cards.map(cardHTML).join('')}</div>`;
+      html += `<div class="cell">${cards.length ? cards.map(cardHTML).join('') : '<div class="cell-empty">Empty</div>'}</div>`;
     }
   }
-  html += '</div></div>';
-  if (!state.loading && !all.length && !state.error) html = '<div class="empty-state">🎉 No PRs involving you right now</div>';
-  main.innerHTML = html;
+  return html + '</div></div>';
+}
+
+function renderRail() {
+  const rail = $('#rail');
+  rail.hidden = false;
+  if (!state.prs.length && state.loading) { rail.innerHTML = '<div class="rail-head"><span class="move-n zero">–</span><span class="move-l" id="railTitle">Checking your clock…</span></div>'; return; }
+  const mine = state.prs.filter((p) => p.turn === 'me').sort((a, b) => a.since - b.since);
+  const others = state.prs.filter((p) => isOpen(p) && p.lane !== 'draft' && p.turn !== 'me').length;
+  if (!mine.length) {
+    rail.innerHTML = `<div class="rail-head"><span class="move-n zero num">0</span><span class="move-l" id="railTitle">Nothing on your clock</span>
+      <span class="move-sub">${others ? `${others} PR${others > 1 ? 's are' : ' is'} waiting on someone else.` : ''}</span></div>`;
+    return;
+  }
+  const limit = showAllTiles ? mine.length : 6;
+  const tiles = mine.slice(0, limit).map((p) => {
+    const lvl = staleLevel(waitOf(p));
+    return `<button class="tile" data-id="${esc(p.id)}" aria-current="${p.id === selectedId}">
+      <span class="tile-main"><span class="ref">${esc(p.repo)} #${p.number}</span><span class="tile-title" title="${esc(p.title)}">${esc(p.title)}</span><span class="verb">${verbFor(p)}</span></span>
+      <span class="tile-clock ${lvl === 'danger' ? 'danger' : ''}" title="Waiting on you for ${fmtDur(waitOf(p))}">${lvl === 'danger' ? ic('flag', 'sm') : ''}${fmtClock(waitOf(p))}</span>
+    </button>`;
+  }).join('');
+  const more = mine.length > limit ? `<button class="tile-more" data-act="more">Show ${mine.length - limit} more</button>` : '';
+  rail.innerHTML = `<div class="rail-head"><span class="move-n num">${mine.length}</span><span class="move-l" id="railTitle">${mine.length === 1 ? 'PR is' : 'PRs are'} on your clock</span>
+    <span class="move-sub">Longest wait ${fmtDur(waitOf(mine[0]))}</span></div><div class="tiles">${tiles}${more}</div>`;
+}
+
+function renderToolbar() {
+  const all = state.prs;
+  const open = all.filter(isOpen);
+  $('#nAll').textContent = open.length || '';
+  $('#nMine').textContent = open.filter((p) => p.isMine).length || '';
+  $('#nReview').textContent = open.filter((p) => !p.isMine).length || '';
+  $('#nFlag').textContent = all.filter(isFlagged).length || '';
+  document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.role === ui.role)));
+  $('#fFlag').setAttribute('aria-pressed', String(!!ui.flagged));
+  const repos = [...new Set(all.map((p) => p.repo))].sort();
+  $('#fRepo').innerHTML = '<option value="">All repositories</option>' + repos.map((r) => `<option ${r === ui.repo ? 'selected' : ''}>${esc(r)}</option>`).join('');
+  $('#fSwim').checked = ui.swim;
+  if ($('#fQ') !== document.activeElement) $('#fQ').value = ui.q;
 }
 
 function renderHeader() {
   const me = state.me;
-  $('#me').innerHTML = me ? `${avatarImg(me.avatarUrl, me.login, 'avatar')} ${esc(me.login)}${state.demo ? ' (demo)' : ''}` : '';
-  let s = state.loading ? '<span class="spin">⟳</span> Loading...' : state.fetchedAt ? `Updated ${new Date(state.fetchedAt).toLocaleTimeString('en-US')}` : '';
-  if (state.rate && !state.loading) s += ` · API left ${state.rate.remaining}/${state.rate.limit}`;
-  $('#status').innerHTML = s;
+  $('#me').innerHTML = me ? `<span>${esc(me.login)}</span>${avatarImg(me.avatarUrl, me.login, 'avatar')}` : '';
+  $('#demoPill').innerHTML = state.demo ? '<span class="demo-pill">Demo data</span>' : '';
+  let s = '';
+  if (state.loading) s = 'Updating…';
+  else if (state.fetchedAt) s = `Updated ${new Date(state.fetchedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+  if (state.rate && !state.loading) s += ` · ${state.rate.remaining} API calls left`;
+  $('#status').textContent = s;
+  $('#btnRefresh').classList.toggle('spinning', state.loading);
   const turns = state.prs.filter((p) => p.turn === 'me').length;
   document.title = turns ? `(${turns}) PR Monitor` : 'PR Monitor';
 }
 
-function renderBanners() {
-  const b = [];
-  if (state.error) b.push(`<div class="banner error">⚠️ ${esc(state.error)}</div>`);
+function renderNotices() {
+  const n = [];
+  if (state.error) n.push(`<div class="notice" role="alert">${ic('alert')}<span>${esc(state.error)}</span></div>`);
   if (state.warnings.length) {
     const sso = state.warnings.some((w) => /SAML|SSO/i.test(w));
-    b.push(`<div class="banner warn">Some data could not be loaded: ${esc(state.warnings.slice(0, 2).join('; '))}${sso ? '. Open your token page and click “Configure SSO” to authorize the org.' : ''}</div>`);
+    n.push(`<div class="notice warn">${ic('alert')}<span>Some results could not be loaded: ${esc(state.warnings.slice(0, 2).join('; '))}${sso ? '. Open your token on GitHub and use Configure SSO to authorize the organization.' : ''}</span></div>`);
   }
-  if (state.demo) b.push('<div class="banner warn">Showing demo data. Open ⚙️ Settings and add a token to see your own PRs.</div>');
-  $('#banners').innerHTML = b.join('');
+  if (state.demo) n.push(`<div class="notice warn">${ic('alert')}<span>You are looking at demo data. <a href="#" data-act="settings">Add a token</a> to load your pull requests.</span></div>`);
+  $('#notices').innerHTML = n.join('');
 }
 
+/* ---------- Inspector ---------- */
+
 function showDetail(id) {
-  const p = state.prs.find((x) => x.id === id);
-  if (!p) return;
+  selectedId = id;
+  render();
+  $('#inspector').focus({ preventScroll: true });
+}
+function closeDetail() {
+  if (!selectedId) return;
+  const id = selectedId;
+  selectedId = null;
+  render();
+  document.querySelector(`.card[data-id="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+}
+
+function renderInspector() {
+  const el = $('#inspector');
+  const p = selectedId && state.prs.find((x) => x.id === selectedId);
+  document.body.classList.toggle('inspecting', !!p);
+  el.classList.toggle('open', !!p);
+  if (!p) { el.innerHTML = ''; return; }
   const lane = LANES.find((l) => l.id === p.lane);
   const unresolved = p.threads.filter((t) => !t.resolved).sort((a, b) => a.createdAt - b.createdAt);
-  const resolved = p.threads.length - unresolved.length;
+  const when = (t) => (t ? `<time title="${esc(fmtDate(t))}">${ago(t)}</time>` : '—');
   const facts = [
-    ['Status', `${lane.title} · ${esc(turnText(p))}`],
-    ['Time in state', p.lane === 'done' ? '—' : `${fmtDur(Date.now() - p.since)} (since ${fmtDate(p.since)})`],
-    ['Opened', `${fmtDate(p.createdAt)} (${ago(p.createdAt)})`],
-    ['Last push', `${fmtDate(p.lastPushAt)} (${ago(p.lastPushAt)})`],
-    ['Last review/comment', p.lastFeedbackAt ? `${fmtDate(p.lastFeedbackAt)} (${ago(p.lastFeedbackAt)})` : 'None yet'],
-    ['Review threads', `${resolved}/${p.threads.length} resolved${p.awaitingAuthor ? ` · ${p.awaitingAuthor} waiting on author` : ''}${p.authorReplied ? ` · ${p.authorReplied} author replied, waiting on reviewer` : ''}`],
-    ['General comments', p.comments],
+    ['Status', `${lane.title} · ${esc(turnSentence(p))}`],
+    ['Opened', when(p.createdAt)],
+    ['Last push', when(p.lastPushAt)],
+    ['Last feedback', p.lastFeedbackAt ? when(p.lastFeedbackAt) : 'None yet'],
+    ['Threads', p.threads.length ? `${p.threads.length - unresolved.length} of ${p.threads.length} resolved${p.awaitingAuthor ? ` · ${p.awaitingAuthor} waiting on @${esc(p.author)}` : ''}${p.authorReplied ? ` · ${p.authorReplied} answered, waiting on reviewer` : ''}` : 'No review threads'],
+    ['Comments', `${p.comments} on the conversation`],
     ['Branch', `<code>${esc(p.head)}</code> → <code>${esc(p.base)}</code>`],
-    ['Changes', `<span class="ok">+${p.additions}</span> <span class="bad">−${p.deletions}</span> · ${p.changedFiles} files · ${p.commits} commits`],
-    ['CI / Merge', `${p.ci ? (CI_ICON[p.ci]?.[2] || p.ci) : 'No CI'}${p.mergeable === 'CONFLICTING' ? ' · <span class="bad">Has conflicts</span>' : ''}`],
+    ['Size', `<span class="num"><span class="add">+${p.additions}</span> <span class="del">−${p.deletions}</span></span> · ${p.changedFiles} files · ${p.commits} commits`],
+    ['Checks', `${p.ci ? (CI[p.ci]?.[2] || p.ci) : 'No checks'}${p.mergeable === 'CONFLICTING' && isOpen(p) ? ' · <span class="bad">merge conflict</span>' : ''}`],
   ];
-  if (p.lane === 'done') facts.splice(1, 1, [p.state === 'MERGED' ? 'Merged' : 'Closed', `${fmtDate(p.closedAt)} · took ${fmtDur(p.closedAt - p.createdAt)}`]);
+  if (p.lane === 'done') facts.splice(1, 0, [p.state === 'MERGED' ? 'Merged' : 'Closed', `${when(p.closedAt)}, ${fmtDur(p.closedAt - p.createdAt)} after opening`]);
 
-  const reviewers = p.reviewers.map((r) => `<li>${avatarImg(r.avatar, r.login, 'avatar')}<div class="grow"><b>${esc(r.login)}</b>${r.bot ? ' <span class="tag">bot</span>' : ''}<br>
-    <span class="snippet">${r.state ? `${STATE_ICON[r.state]} ${STATE_TEXT[r.state]} · ${ago(r.lastAt)}` : 'Not reviewed yet'}${r.pending ? ` · ⏳ ${r.state ? 're-review' : 'review'} requested` : ''}</span></div></li>`)
-    .concat(p.teams.map((t) => `<li>👥<div class="grow"><b>@${esc(t)}</b><br><span class="snippet">⏳ Waiting on team review</span></div></li>`));
+  const reviewers = p.reviewers.map((r) => {
+    const s = r.state ? `<span class="state-line">${ic(STATE_ICON[r.state], 'sm')}${STATE_TEXT[r.state]} ${ago(r.lastAt)}</span>` : '<span>Has not reviewed</span>';
+    const req = r.pending ? `<span class="pill on-reviewer">${ic('hourglass', 'sm')}${r.state ? 'Re-review requested' : 'Review requested'}</span>` : '';
+    return `<li>${avatarImg(r.avatar, r.login)}<div class="grow"><span><b>${esc(r.login)}</b>${r.bot ? ' <span class="pill">bot</span>' : ''}</span><span class="sub">${s}${req}</span></div></li>`;
+  }).concat(p.teams.map((t) => `<li>${ic('team', 'lg')}<div class="grow"><b>@${esc(t)}</b><span class="sub"><span class="pill on-reviewer">${ic('hourglass', 'sm')}Team review requested</span></span></div></li>`));
 
-  const threadItems = unresolved.map((t) => {
-    const whose = eq(t.lastBy, p.author) ? `↩️ @${esc(p.author)} replied, waiting on reviewer` : `⏳ Waiting on @${esc(p.author)}`;
-    return `<li>${avatarImg(t.starterAvatar, t.starter, 'avatar')}<div class="grow">
-      <div><b>${esc(t.starter || '?')}</b> · <code>${esc(t.path || '')}</code> · ${ago(t.createdAt)}${t.outdated ? ' · <span class="tag">outdated</span>' : ''}${t.starterBot ? ' · <span class="tag">bot</span>' : ''}</div>
-      <div class="snippet">${esc(t.body)}</div>
-      <div class="snippet">${whose} · ${t.count} messages · last ${ago(t.lastAt)} · <a href="${esc(t.url)}" target="_blank" rel="noopener">Open ↗</a></div>
+  const threads = unresolved.map((t) => {
+    const onAuthor = !eq(t.lastBy, p.author);
+    const tag = onAuthor
+      ? `<span class="pill on-author">${ic('hourglass', 'sm')}Waiting on @${esc(p.author)}</span>`
+      : `<span class="pill on-reviewer">${ic('reply', 'sm')}@${esc(p.author)} replied</span>`;
+    return `<li>${avatarImg(t.starterAvatar, t.starter)}<div class="grow">
+      <span class="sub"><b style="color:var(--text)">${esc(t.starter || 'unknown')}</b>${t.path ? `<code>${esc(t.path)}</code>` : ''}${t.outdated ? '<span class="pill">outdated</span>' : ''}${t.starterBot ? '<span class="pill">bot</span>' : ''}</span>
+      <span class="body">${esc(t.body)}</span>
+      <span class="sub">${tag}<span>${t.count} message${t.count === 1 ? '' : 's'}, last ${ago(t.lastAt)}</span>${t.url ? `<a href="${esc(t.url)}" target="_blank" rel="noopener">Open</a>` : ''}</span>
     </div></li>`;
   });
 
-  const dlg = $('#dlgPR');
-  dlg.innerHTML = `<div class="dlg-head"><div><div class="status-line">${esc(p.repo)} #${p.number} · by @${esc(p.author)}</div>
-      <h3><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)} ↗</a></h3></div>
-      <button data-act="close">✕</button></div>
-    <div class="dlg-body">
+  el.innerHTML = `<div class="insp-head">
+      <div class="insp-top"><span>${esc(p.repo)} #${p.number} · @${esc(p.author)}</span>
+        <button class="btn ghost icon" data-act="close" aria-label="Close details">${ic('x')}</button></div>
+      <h2 class="insp-title"><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)}</a></h2>
+      ${clockHTML(p, 'lg')}
+      <div><a class="btn" href="${esc(p.url)}" target="_blank" rel="noopener" style="text-decoration:none">${ic('external', 'sm')}Open on GitHub</a></div>
+    </div>
+    <div class="insp-body">
       <dl class="facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
-      <h4>Reviewers</h4>${reviewers.length ? `<ul class="list">${reviewers.join('')}</ul>` : '<div class="status-line">No reviewers yet</div>'}
-      <h4>Unresolved comments (${unresolved.length})</h4>${threadItems.length ? `<ul class="list">${threadItems.join('')}</ul>` : '<div class="status-line">None 🎉</div>'}
+      <section><h4>Reviewers <span class="num">${p.reviewers.length + p.teams.length || ''}</span></h4>${reviewers.length ? `<ul class="list">${reviewers.join('')}</ul>` : '<p class="none">No reviewers requested yet.</p>'}</section>
+      <section><h4>Unresolved threads <span class="num">${unresolved.length || ''}</span></h4>${threads.length ? `<ul class="list">${threads.join('')}</ul>` : '<p class="none">Every review thread is resolved.</p>'}</section>
     </div>`;
-  dlg.showModal();
 }
 
 /* ---------- Load / refresh ---------- */
@@ -724,7 +996,7 @@ function maybeNotify() {
   if (knownTurnIds && settings.notify && 'Notification' in window && Notification.permission === 'granted') {
     const fresh = state.prs.filter((p) => ids.has(p.id) && !knownTurnIds.has(p.id));
     for (const p of fresh.slice(0, 5)) {
-      const n = new Notification(`🔥 Your turn: ${p.repo} #${p.number}`, { body: `${p.title}\n${p.hint}`, tag: p.id });
+      const n = new Notification(`Your move: ${p.repo} #${p.number}`, { body: `${p.title}\n${p.hint}`, tag: p.id });
       n.onclick = () => { window.focus(); showDetail(p.id); };
     }
   }
@@ -855,34 +1127,38 @@ $('#btnClearToken').addEventListener('click', () => {
 
 /* ---------- Events ---------- */
 
-function saveUI() { store.set(UI_KEY, { role: ui.role, repo: ui.repo, myTurn: ui.myTurn, swim: ui.swim }); }
+function saveUI() { store.set(UI_KEY, { role: ui.role, repo: ui.repo, swim: ui.swim, flagged: ui.flagged }); }
 $('#btnRefresh').addEventListener('click', refresh);
 $('#btnSettings').addEventListener('click', openSettings);
-$('#chipTurn').addEventListener('click', () => { ui.myTurn = !ui.myTurn; saveUI(); render(); });
-$('#fRole').addEventListener('change', (e) => { ui.role = e.target.value; saveUI(); render(); });
+document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => { ui.role = b.dataset.role; saveUI(); render(); }));
+$('#fFlag').addEventListener('click', () => { ui.flagged = !ui.flagged; saveUI(); render(); });
 $('#fRepo').addEventListener('change', (e) => { ui.repo = e.target.value; saveUI(); render(); });
 $('#fSwim').addEventListener('change', (e) => { ui.swim = e.target.checked; saveUI(); render(); });
 $('#fQ').addEventListener('input', (e) => { ui.q = e.target.value; render(); });
 document.addEventListener('click', (e) => {
   const act = e.target.closest('[data-act]')?.dataset.act;
+  if (act) e.preventDefault();
   if (act === 'settings') return openSettings();
   if (act === 'demo') return loadDemo();
-  if (act === 'close') return e.target.closest('dialog').close();
+  if (act === 'close') return closeDetail();
+  if (act === 'more') { showAllTiles = true; return render(); }
   if (e.target.closest('a')) return;
-  const card = e.target.closest('.card');
-  if (card) showDetail(card.dataset.id);
+  const item = e.target.closest('.card, .tile');
+  if (item) return item.dataset.id === selectedId && item.classList.contains('card') ? closeDetail() : showDetail(item.dataset.id);
 });
 document.addEventListener('keydown', (e) => {
-  if (e.target.matches('input, select, textarea') || document.querySelector('dialog[open]')) return;
+  if (document.querySelector('dialog[open]')) return;
+  if (e.key === 'Escape' && selectedId) { e.preventDefault(); return closeDetail(); }
+  if (e.target.matches('input, select, textarea')) return;
   if (e.key === 'Enter' && e.target.classList?.contains('card')) showDetail(e.target.dataset.id);
+  if (e.key === '/' ) { e.preventDefault(); $('#fQ').focus(); }
   if (e.key === 'r' && !e.metaKey && !e.ctrlKey) refresh();
 });
-$('#dlgPR').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && settings.token && !state.demo && state.fetchedAt && settings.refreshMin > 0
       && Date.now() - state.fetchedAt > settings.refreshMin * 60e3) refresh();
 });
-setInterval(() => { if (state.prs.length && !document.querySelector('dialog[open]')) render(); }, 60e3); // keep ages fresh
+setInterval(() => { if (state.prs.length && !document.querySelector('dialog[open]')) render(); }, 60e3); // keep clocks fresh
 
 /* ---------- Start ---------- */
 
