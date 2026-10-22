@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PR Monitor</title>
+<style>
+:root {
+  --bg: #f4f5f7; --panel: #ffffff; --panel-2: #ebecf0; --text: #172b4d; --muted: #5e6c84;
+  --border: #dfe1e6; --accent: #0c66e4; --accent-soft: #e9f2ff;
+  --ok: #1f845a; --ok-soft: #dcfff1; --warn: #a54800; --warn-soft: #fff7d6;
+  --danger: #c9372c; --danger-soft: #ffeceb; --purple: #6e5dc6; --purple-soft: #f3f0ff;
+  --fire: #e2483d; --shadow: 0 1px 2px rgba(9,30,66,.2);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1d2125; --panel: #22272b; --panel-2: #161a1d; --text: #dee4ea; --muted: #9fadbc;
+    --border: #38414a; --accent: #579dff; --accent-soft: #1c2b41;
+    --ok: #4bce97; --ok-soft: #1c3329; --warn: #f5cd47; --warn-soft: #332e1b;
+    --danger: #f87168; --danger-soft: #42221f; --purple: #9f8fef; --purple-soft: #2b273f;
+    --fire: #ff6b5e; --shadow: 0 1px 2px rgba(0,0,0,.5);
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--text); font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Thai", Roboto, sans-serif; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 1px solid var(--border); background: var(--panel); border-radius: 6px; padding: 6px 12px; }
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+input[type=text], input[type=password], input[type=number], select {
+  border: 1px solid var(--border); background: var(--panel); border-radius: 6px; padding: 6px 8px; min-width: 0;
+}
+
+header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+header h1 { font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px; }
+header .spacer { flex: 1; }
+header .me { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.status-line { color: var(--muted); font-size: 12px; }
+
+.toolbar { display: flex; gap: 8px; padding: 10px 16px; flex-wrap: wrap; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--border); font-size: 13px; white-space: nowrap; }
+.chip b { font-variant-numeric: tabular-nums; }
+button.chip.active { background: var(--accent-soft); border-color: var(--accent); }
+.chip.fire b { color: var(--fire); }
+.chip.danger b { color: var(--danger); }
+.toolbar .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-left: auto; }
+.toolbar label { display: inline-flex; gap: 4px; align-items: center; font-size: 13px; }
+
+.banner { margin: 0 16px 10px; padding: 8px 12px; border-radius: 6px; font-size: 13px; }
+.banner.error { background: var(--danger-soft); color: var(--danger); }
+.banner.warn { background: var(--warn-soft); color: var(--warn); }
+
+.board-wrap { overflow-x: auto; padding: 0 16px 24px; scroll-snap-type: x proximity; }
+.board { display: grid; gap: 0 10px; min-width: min-content; }
+.lane-head { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 6px 0; scroll-snap-align: start; }
+.lane-head .inner { background: var(--panel-2); border-radius: 6px 6px 0 0; padding: 8px 10px; border-top: 3px solid var(--lane-color, var(--border)); }
+.lane-head .t { font-weight: 600; display: flex; justify-content: space-between; gap: 6px; }
+.lane-head .d { font-size: 11px; color: var(--muted); }
+.swim-head { grid-column: 1 / -1; padding: 12px 0 6px; font-weight: 600; color: var(--muted); }
+.swim-head span { position: sticky; left: 0; }
+.cell { background: var(--panel-2); padding: 6px; display: flex; flex-direction: column; gap: 8px; min-height: 60px; border-radius: 0 0 6px 6px; }
+.cell.empty::after { content: "—"; color: var(--muted); text-align: center; font-size: 12px; padding: 12px 0; }
+
+.card { background: var(--panel); border-radius: 6px; box-shadow: var(--shadow); padding: 10px; cursor: pointer; border-left: 3px solid transparent; display: flex; flex-direction: column; gap: 6px; }
+.card:hover { outline: 1px solid var(--accent); }
+.card.turn-me { border-left-color: var(--fire); }
+.card .top { display: flex; justify-content: space-between; gap: 6px; font-size: 12px; color: var(--muted); }
+.card .repo { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card .title { font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+.tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; background: var(--panel-2); color: var(--muted); }
+.tag.mine { background: var(--accent-soft); color: var(--accent); }
+.tag.review { background: var(--purple-soft); color: var(--purple); }
+.turn { font-size: 12px; color: var(--muted); }
+.turn.me { color: var(--fire); font-weight: 600; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--muted); align-items: center; }
+.age { padding: 1px 6px; border-radius: 4px; background: var(--panel-2); font-variant-numeric: tabular-nums; }
+.age.warn { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
+.age.danger { background: var(--danger-soft); color: var(--danger); font-weight: 600; }
+.ok { color: var(--ok); } .bad { color: var(--danger); } .pending { color: var(--warn); }
+.reviewers { display: flex; flex-wrap: wrap; gap: 4px; }
+.rv { position: relative; display: inline-flex; }
+.rv img, .avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--panel-2); display: block; }
+.rv .st { position: absolute; right: -4px; bottom: -4px; font-size: 10px; line-height: 1; background: var(--panel); border-radius: 50%; padding: 1px; }
+.team { font-size: 11px; padding: 2px 6px; border: 1px dashed var(--border); border-radius: 999px; color: var(--muted); }
+
+.empty-state { max-width: 560px; margin: 40px auto; background: var(--panel); padding: 24px; border-radius: 8px; box-shadow: var(--shadow); }
+.empty-state h2 { margin-top: 0; }
+.empty-state .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+dialog { border: none; border-radius: 10px; padding: 0; background: var(--panel); color: var(--text); width: min(720px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-shadow: 0 8px 32px rgba(0,0,0,.35); }
+dialog::backdrop { background: rgba(9,30,66,.5); }
+.dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 16px 16px 8px; position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--border); }
+.dlg-head h3 { margin: 0; font-size: 16px; }
+.dlg-body { padding: 12px 16px 16px; }
+.dlg-body h4 { margin: 16px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.list li { display: flex; gap: 8px; align-items: flex-start; padding: 8px; background: var(--panel-2); border-radius: 6px; font-size: 13px; }
+.list li .grow { flex: 1; min-width: 0; }
+.snippet { color: var(--muted); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.form { display: grid; gap: 12px; }
+.form label { display: grid; gap: 4px; font-size: 13px; }
+.form .hint { color: var(--muted); font-size: 12px; }
+.form .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.form .check { display: flex; gap: 8px; align-items: center; }
+.dlg-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); position: sticky; bottom: 0; background: var(--panel); }
+.spin { display: inline-block; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  header, .toolbar { padding-left: 12px; padding-right: 12px; }
+  .board-wrap { padding: 0 12px 24px; }
+  .toolbar .filters { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🗂️ PR Monitor</h1>
+  <span class="status-line" id="status"></span>
+  <span class="spacer"></span>
+  <span class="me" id="me"></span>
+  <button id="btnRefresh" title="รีเฟรช (R)">⟳ รีเฟรช</button>
+  <button id="btnSettings">⚙️ ตั้งค่า</button>
+</header>
+
+<div class="toolbar" id="toolbar" hidden>
+  <button class="chip fire" id="chipTurn" title="แสดงเฉพาะ PR ที่ถึงตาคุณ">🔥 ถึงตาคุณ <b id="cTurn">0</b></button>
+  <span class="chip danger" title="PR ที่ค้างในสถานะปัจจุบันเกินเกณฑ์ 'นานมาก'">⚠️ ค้างนาน <b id="cStale">0</b></span>
+  <span class="chip">🧑‍💻 ของฉัน <b id="cMine">0</b></span>
+  <span class="chip">👀 ที่ฉันรีวิว <b id="cReview">0</b></span>
+  <div class="filters">
+    <select id="fRole" aria-label="role">
+      <option value="all">ทั้งหมด</option>
+      <option value="mine">PR ของฉัน</option>
+      <option value="review">PR ที่ฉันรีวิว</option>
+    </select>
+    <select id="fRepo" aria-label="repo"><option value="">ทุก repo</option></select>
+    <input type="text" id="fQ" placeholder="ค้นหา ชื่อ / #เลข / คน" size="18">
+    <label><input type="checkbox" id="fSwim"> แยกแถวตาม role</label>
+  </div>
+</div>
+
+<div id="banners"></div>
+<main id="main"></main>
+
+<dialog id="dlgPR"></dialog>
+
+<dialog id="dlgSettings">
+  <form method="dialog" id="settingsForm">
+    <div class="dlg-head"><h3>⚙️ ตั้งค่า</h3><button value="cancel" formnovalidate>✕</button></div>
+    <div class="dlg-body form">
+      <label>GitHub Personal Access Token
+        <input type="password" name="token" autocomplete="off" placeholder="ghp_... หรือ github_pat_...">
+        <span class="hint">
+          สร้างได้ที่ <a href="https://github.com/settings/tokens/new?scopes=repo&description=PR%20Monitor" target="_blank" rel="noopener">github.com/settings/tokens</a>
+          (classic token, scope <code>repo</code>) — ถ้า org ใช้ SSO ต้องกด “Configure SSO” → Authorize ด้วย
+          <br>Token เก็บใน browser นี้เท่านั้น (localStorage) และส่งไปที่ api.github.com เท่านั้น
+        </span>
+      </label>
+      <label>กรองเพิ่มเติม (GitHub search qualifiers)
+        <input type="text" name="extraQuery" placeholder="เช่น org:my-company หรือ repo:owner/name">
+        <span class="hint">เว้นว่าง = ทุก repo ที่ token เข้าถึงได้</span>
+      </label>
+      <div class="row">
+        <label>เริ่มเตือน (เหลือง) เมื่อค้างเกิน (ชม.)<input type="number" name="warnHours" min="1"></label>
+        <label>นานมาก (แดง) เมื่อค้างเกิน (ชม.)<input type="number" name="dangerHours" min="1"></label>
+        <label>Done แสดงย้อนหลัง (วัน)<input type="number" name="doneDays" min="0" max="90"></label>
+        <label>รีเฟรชอัตโนมัติทุก (นาที, 0 = ปิด)<input type="number" name="refreshMin" min="0"></label>
+      </div>
+      <label class="check"><input type="checkbox" name="includeAssigned"> รวม PR ที่ถูก assign ให้ฉัน (นอกจากถูกขอให้รีวิว)</label>
+      <label class="check"><input type="checkbox" name="ignoreBots"> ไม่นับรีวิว/คอมเมนต์จาก bot (เช่น Copilot, CodeRabbit) ในการจัด lane</label>
+      <label class="check"><input type="checkbox" name="notify"> แจ้งเตือน (browser notification) เมื่อมี PR ใหม่ที่ถึงตาคุณ</label>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" id="btnClearToken">ลบ token</button>
+      <span class="spacer" style="flex:1"></span>
+      <button value="cancel" formnovalidate>ยกเลิก</button>
+      <button value="save" class="primary">บันทึก</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+'use strict';
+
+/* ---------- Config ---------- */
+
+const LANES = [
+  { id: 'draft',    title: '📝 Draft',               desc: 'ยังไม่พร้อมให้รีวิว',                  color: '#8590a2' },
+  { id: 'waiting',  title: '👀 รอรีวิว',               desc: 'ยังไม่มีใครรีวิว / รอ reviewer',        color: '#579dff' },
+  { id: 'changes',  title: '🔧 ต้องแก้ไข',             desc: 'มีคอมเมนต์ / ขอแก้ ยังไม่ได้อัปเดต',     color: '#f87168' },
+  { id: 'updated',  title: '🔁 แก้แล้ว รอรีวิวซ้ำ',     desc: 'author อัปเดตหลังได้รับรีวิวแล้ว',      color: '#9f8fef' },
+  { id: 'approved', title: '✅ Approved',             desc: 'ได้ approve แล้ว พร้อม merge',          color: '#4bce97' },
+  { id: 'done',     title: '🎉 Done',                 desc: 'merged / closed ล่าสุด',               color: '#8590a2' },
+];
+const SWIMLANES = [
+  { id: 'mine',   title: '🧑‍💻 PR ของฉัน' },
+  { id: 'review', title: '👀 PR ที่ฉันต้องรีวิว / เคยรีวิว' },
+];
+const DEFAULTS = {
+  token: '', extraQuery: '', warnHours: 24, dangerHours: 72, doneDays: 7, refreshMin: 5,
+  includeAssigned: true, ignoreBots: true, notify: false,
+};
+const SETTINGS_KEY = 'prmonitor.settings.v1';
+const UI_KEY = 'prmonitor.ui.v1';
+const H = 3600e3;
+
+/* ---------- State ---------- */
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let settings = { ...DEFAULTS, ...store.get(SETTINGS_KEY, {}) };
+let ui = { role: 'all', repo: '', q: '', myTurn: false, swim: true, ...store.get(UI_KEY, {}) };
+let state = { me: null, prs: [], loading: false, error: null, warnings: [], demo: false, fetchedAt: null, rate: null };
+let knownTurnIds = null;
+let refreshTimer = null;
+
+/* ---------- Helpers ---------- */
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ts = (s) => (s ? Date.parse(s) || 0 : 0);
+const eq = (a, b) => !!a && !!b && a.toLowerCase() === b.toLowerCase();
+const maxOf = (arr) => arr.reduce((m, x) => (x > m ? x : m), 0);
+
+function fmtDur(ms) {
+  if (ms < 0) ms = 0;
+  const m = Math.floor(ms / 60000);
+  if (m < 60) return `${m} นาที`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} ชม.`;
+  const d = Math.floor(h / 24), rh = h % 24;
+  return rh && d < 7 ? `${d} วัน ${rh} ชม.` : `${d} วัน`;
+}
+const ago = (t) => (t ? `${fmtDur(Date.now() - t)}ที่แล้ว` : '—');
+const fmtDate = (t) => (t ? new Date(t).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' }) : '—');
+
+function staleLevel(ms) {
+  const h = ms / H;
+  if (h >= settings.dangerHours) return 'danger';
+  if (h >= settings.warnHours) return 'warn';
+  return '';
+}
+const isBotActor = (a) => !!a && (a.__typename === 'Bot' || /\[bot\]$/i.test(a.login || ''));
+
+/* ---------- GitHub API ---------- */
+
+const PR_FRAGMENT = `
+fragment PRF on PullRequest {
+  id number title url isDraft state merged mergedAt closedAt createdAt updatedAt
+  additions deletions changedFiles mergeable reviewDecision headRefName baseRefName
+  author { __typename login avatarUrl }
+  repository { nameWithOwner }
+  reviewRequests(first: 20) { nodes { requestedReviewer {
+    __typename
+    ... on User { login avatarUrl }
+    ... on Bot { login avatarUrl }
+    ... on Mannequin { login avatarUrl }
+    ... on Team { name slug }
+  } } }
+  reviews(last: 60) { nodes { state submittedAt author { __typename login avatarUrl } } }
+  reviewThreads(first: 60) { totalCount nodes {
+    isResolved isOutdated path
+    firstComment: comments(first: 1) { totalCount nodes { author { __typename login avatarUrl } bodyText createdAt url } }
+    lastComment: comments(last: 1) { nodes { author { __typename login } createdAt } }
+  } }
+  comments { totalCount }
+  commits(last: 1) { totalCount nodes { commit { committedDate statusCheckRollup { state } } } }
+  timelineItems(last: 40, itemTypes: [PULL_REQUEST_COMMIT, HEAD_REF_FORCE_PUSHED_EVENT, REVIEW_REQUESTED_EVENT, READY_FOR_REVIEW_EVENT]) {
+    nodes {
+      __typename
+      ... on PullRequestCommit { commit { committedDate } }
+      ... on HeadRefForcePushedEvent { createdAt }
+      ... on ReadyForReviewEvent { createdAt }
+      ... on ReviewRequestedEvent { createdAt requestedReviewer { __typename ... on User { login } ... on Team { slug } } }
+    }
+  }
+}`;
+const SEARCH_QUERY = `
+query($q: String!, $after: String) {
+  search(query: $q, type: ISSUE, first: 25, after: $after) {
+    issueCount
+    pageInfo { hasNextPage endCursor }
+    nodes { ...PRF }
+  }
+  rateLimit { remaining limit resetAt }
+}` + PR_FRAGMENT;
+
+async function gql(query, variables) {
+  const res = await fetch('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: { Authorization: `bearer ${settings.token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables }),
+  });
+  if (res.status === 401) throw new Error('Token ไม่ถูกต้องหรือหมดอายุ (401) — ตรวจสอบในหน้าตั้งค่า');
+  if (res.status === 403) throw new Error('GitHub ปฏิเสธคำขอ (403) — อาจติด rate limit หรือ token ไม่มีสิทธิ์');
+  if (!res.ok) throw new Error(`GitHub API error ${res.status}`);
+  const j = await res.json();
+  if (j.errors?.length) {
+    const msgs = [...new Set(j.errors.map((e) => e.message))];
+    if (!j.data) throw new Error(msgs.join('; '));
+    state.warnings.push(...msgs);
+  }
+  return j.data;
+}
+
+function buildSearches(me) {
+  const extra = settings.extraQuery.trim();
+  const base = `is:pr archived:false ${extra}`.trim();
+  const since = new Date(Date.now() - settings.doneDays * 24 * H).toISOString().slice(0, 10);
+  const list = [
+    { key: 'authored',  q: `${base} is:open author:${me}` },
+    { key: 'requested', q: `${base} is:open review-requested:${me}` },
+    { key: 'reviewed',  q: `${base} is:open reviewed-by:${me} -author:${me}` },
+  ];
+  if (settings.includeAssigned) list.push({ key: 'assigned', q: `${base} is:open assignee:${me} -author:${me}` });
+  if (settings.doneDays > 0) {
+    list.push({ key: 'done', q: `${base} is:closed author:${me} closed:>=${since}` });
+    list.push({ key: 'done', q: `${base} is:closed reviewed-by:${me} -author:${me} closed:>=${since}` });
+  }
+  return list;
+}
+
+async function searchAll(q, maxPages = 4) {
+  const out = [];
+  let after = null;
+  for (let i = 0; i < maxPages; i++) {
+    const data = await gql(SEARCH_QUERY, { q, after });
+    state.rate = data.rateLimit;
+    out.push(...(data.search.nodes || []).filter((n) => n && n.id));
+    if (!data.search.pageInfo.hasNextPage) break;
+    after = data.search.pageInfo.endCursor;
+  }
+  return out;
+}
+
+async function fetchFromGitHub() {
+  if (!state.me) {
+    const d = await gql('query { viewer { login avatarUrl } }');
+    state.me = d.viewer;
+  }
+  const me = state.me.login;
+  const results = await Promise.all(buildSearches(me).map(async (s) => ({ key: s.key, nodes: await searchAll(s.q) })));
+  return collect(results);
+}
+
+function collect(results) {
+  const byId = new Map();
+  for (const { key, nodes } of results) {
+    for (const n of nodes) {
+      const e = byId.get(n.id) || { node: n, src: new Set() };
+      e.src.add(key);
+      byId.set(n.id, e);
+    }
+  }
+  return [...byId.values()];
+}
+
+/* ---------- Classification ---------- */
+
+function analyze(n, me, src) {
+  const ignore = (a) => settings.ignoreBots && isBotActor(a);
+  const author = n.author?.login || 'ghost';
+  const isMine = eq(author, me);
+
+  // Timeline: last push, ready-for-review, review requests
+  let lastPushAt = ts(n.commits?.nodes?.[0]?.commit?.committedDate);
+  let readyAt = ts(n.createdAt), lastRequestAt = 0, myRequestAt = 0, teamRequestAt = 0;
+  for (const it of n.timelineItems?.nodes || []) {
+    if (!it) continue;
+    if (it.__typename === 'PullRequestCommit') lastPushAt = Math.max(lastPushAt, ts(it.commit?.committedDate));
+    else if (it.__typename === 'HeadRefForcePushedEvent') lastPushAt = Math.max(lastPushAt, ts(it.createdAt));
+    else if (it.__typename === 'ReadyForReviewEvent') readyAt = Math.max(readyAt, ts(it.createdAt));
+    else if (it.__typename === 'ReviewRequestedEvent') {
+      const t = ts(it.createdAt), r = it.requestedReviewer;
+      lastRequestAt = Math.max(lastRequestAt, t);
+      if (r && eq(r.login, me)) myRequestAt = Math.max(myRequestAt, t);
+      if (r && r.__typename === 'Team') teamRequestAt = Math.max(teamRequestAt, t);
+    }
+  }
+
+  // Reviewers: latest state per person (COMMENTED doesn't override APPROVED / CHANGES_REQUESTED)
+  const reviewers = new Map();
+  let lastFeedbackAt = 0, lastApprovalAt = 0;
+  const reviews = (n.reviews?.nodes || [])
+    .filter((r) => r && r.author && r.submittedAt && r.state !== 'PENDING')
+    .sort((a, b) => ts(a.submittedAt) - ts(b.submittedAt));
+  for (const r of reviews) {
+    if (eq(r.author.login, author)) continue; // author's thread replies show up as reviews
+    const t = ts(r.submittedAt);
+    const e = reviewers.get(r.author.login) || { login: r.author.login, avatar: r.author.avatarUrl, state: null, lastAt: 0, bot: isBotActor(r.author), pending: false };
+    e.lastAt = Math.max(e.lastAt, t);
+    if (r.state === 'COMMENTED') { if (!e.state || e.state === 'DISMISSED') e.state = 'COMMENTED'; }
+    else e.state = r.state;
+    reviewers.set(r.author.login, e);
+    if (ignore(r.author)) continue;
+    if (r.state === 'APPROVED') lastApprovalAt = Math.max(lastApprovalAt, t);
+    else if (r.state !== 'DISMISSED') lastFeedbackAt = Math.max(lastFeedbackAt, t);
+  }
+  const teams = [];
+  for (const rr of n.reviewRequests?.nodes || []) {
+    const r = rr?.requestedReviewer;
+    if (!r) continue;
+    if (r.__typename === 'Team') { teams.push(r.slug || r.name); continue; }
+    const e = reviewers.get(r.login) || { login: r.login, avatar: r.avatarUrl, state: null, lastAt: 0, bot: isBotActor(r) };
+    e.pending = true;
+    reviewers.set(r.login, e);
+  }
+  const requestedMe = src.has('requested') || [...reviewers.values()].some((r) => r.pending && eq(r.login, me));
+
+  // Review threads
+  const threads = (n.reviewThreads?.nodes || []).filter(Boolean).map((t) => {
+    const f = t.firstComment?.nodes?.[0], l = t.lastComment?.nodes?.[0];
+    return {
+      resolved: t.isResolved, outdated: t.isOutdated, path: t.path,
+      starter: f?.author?.login, starterAvatar: f?.author?.avatarUrl, starterBot: isBotActor(f?.author),
+      body: f?.bodyText || '', url: f?.url, createdAt: ts(f?.createdAt),
+      lastBy: l?.author?.login, lastAt: ts(l?.createdAt), count: t.firstComment?.totalCount || 0,
+    };
+  });
+  const counted = threads.filter((t) => !(settings.ignoreBots && t.starterBot));
+  const unresolved = counted.filter((t) => !t.resolved);
+  const awaitingAuthor = unresolved.filter((t) => !eq(t.lastBy, author));
+  const authorReplied = unresolved.filter((t) => eq(t.lastBy, author));
+  const lastAuthorReplyAt = maxOf(authorReplied.map((t) => t.lastAt));
+
+  // Overall lane (author's point of view)
+  const human = [...reviewers.values()].filter((r) => !(settings.ignoreBots && r.bot));
+  const anyChanges = human.some((r) => r.state === 'CHANGES_REQUESTED') || n.reviewDecision === 'CHANGES_REQUESTED';
+  const anyApproved = human.some((r) => r.state === 'APPROVED');
+  const pendingHumans = human.some((r) => r.pending) || teams.length > 0;
+  const approved = n.reviewDecision === 'APPROVED' || (!n.reviewDecision && anyApproved && !anyChanges && !pendingHumans);
+  const needsFix = anyChanges || awaitingAuthor.length > 0;
+  const authorActedAt = Math.max(lastPushAt, lastAuthorReplyAt, lastRequestAt);
+
+  let lane, turn, since, hint = '';
+  if (n.state !== 'OPEN') {
+    lane = 'done'; turn = 'none'; since = ts(n.mergedAt || n.closedAt);
+  } else if (n.isDraft) {
+    lane = 'draft'; turn = 'draft'; since = ts(n.createdAt);
+  } else if (approved && awaitingAuthor.length === 0) {
+    lane = 'approved'; turn = 'author'; since = lastApprovalAt || ts(n.updatedAt); hint = 'พร้อม merge';
+  } else if (needsFix) {
+    if (authorActedAt > lastFeedbackAt) { lane = 'updated'; turn = 'reviewers'; since = authorActedAt; }
+    else { lane = 'changes'; turn = 'author'; since = lastFeedbackAt; hint = 'แก้ตามรีวิว'; }
+  } else if (lastFeedbackAt && authorActedAt > lastFeedbackAt) {
+    lane = 'updated'; turn = 'reviewers'; since = authorActedAt;
+  } else {
+    lane = 'waiting'; turn = 'reviewers'; since = Math.max(readyAt, lastRequestAt);
+  }
+
+  // Reviewer's point of view: is the ball in my court?
+  if (!isMine && n.state === 'OPEN' && !n.isDraft) {
+    const my = [...reviewers.values()].find((r) => eq(r.login, me) && r.lastAt);
+    const myUnresolved = unresolved.filter((t) => eq(t.starter, me));
+    if (requestedMe) {
+      lane = my ? 'updated' : 'waiting'; turn = 'me';
+      since = myRequestAt || teamRequestAt || readyAt;
+      hint = my ? 'ถูกขอให้รีวิวซ้ำ' : 'ถูกขอให้รีวิว';
+    } else if (my) {
+      if (my.state === 'APPROVED') {
+        if (turn === 'reviewers') turn = 'others';
+        hint = 'คุณ approve แล้ว';
+      } else if (my.state === 'CHANGES_REQUESTED' || myUnresolved.length) {
+        const updated = lastPushAt > my.lastAt || myUnresolved.some((t) => eq(t.lastBy, author) && t.lastAt > my.lastAt);
+        if (updated) { lane = 'updated'; turn = 'me'; since = Math.max(lastPushAt, lastAuthorReplyAt); hint = 'author แก้แล้ว — รีวิวซ้ำ'; }
+        else { lane = 'changes'; turn = 'author'; since = my.lastAt; hint = 'รอ author แก้ตามที่คุณรีวิว'; }
+      } else if (turn === 'reviewers') {
+        turn = 'me'; hint = 'คุณคอมเมนต์แล้ว แต่ยังไม่ approve';
+      }
+    } else if (turn === 'reviewers') {
+      turn = 'me'; hint = src.has('assigned') ? 'ถูก assign ให้คุณ' : 'รอคุณรีวิว';
+    }
+  } else if (isMine && turn === 'author') {
+    turn = 'me';
+  }
+
+  const rollup = n.commits?.nodes?.[0]?.commit?.statusCheckRollup?.state || null;
+  return {
+    id: n.id, number: n.number, title: n.title, url: n.url, repo: n.repository?.nameWithOwner || '',
+    author, authorAvatar: n.author?.avatarUrl, isMine, role: isMine ? 'mine' : 'review',
+    lane, turn, since, hint, state: n.merged ? 'MERGED' : n.state, isDraft: n.isDraft,
+    createdAt: ts(n.createdAt), updatedAt: ts(n.updatedAt), closedAt: ts(n.mergedAt || n.closedAt), readyAt,
+    lastPushAt, lastFeedbackAt, lastApprovalAt, commits: n.commits?.totalCount || 0,
+    additions: n.additions, deletions: n.deletions, changedFiles: n.changedFiles,
+    mergeable: n.mergeable, ci: rollup, reviewDecision: n.reviewDecision,
+    head: n.headRefName, base: n.baseRefName, comments: n.comments?.totalCount || 0,
+    reviewers: [...reviewers.values()].sort((a, b) => (b.lastAt || 0) - (a.lastAt || 0)), teams,
+    threads, counted: counted.length, unresolved: unresolved.length,
+    awaitingAuthor: awaitingAuthor.length, authorReplied: authorReplied.length, requestedMe,
+  };
+}
+
+/* ---------- Rendering ---------- */
+
+const STATE_ICON = { APPROVED: '✅', CHANGES_REQUESTED: '❌', COMMENTED: '💬', DISMISSED: '🚫' };
+const STATE_TEXT = { APPROVED: 'Approved', CHANGES_REQUESTED: 'ขอให้แก้', COMMENTED: 'คอมเมนต์', DISMISSED: 'Dismissed' };
+const CI_ICON = { SUCCESS: ['✓', 'ok', 'CI ผ่าน'], FAILURE: ['✗', 'bad', 'CI ไม่ผ่าน'], ERROR: ['✗', 'bad', 'CI error'], PENDING: ['●', 'pending', 'CI กำลังรัน'], EXPECTED: ['●', 'pending', 'CI รอผล'] };
+
+function turnText(p) {
+  switch (p.turn) {
+    case 'me': return `🔥 ถึงตาคุณ${p.hint ? ' · ' + p.hint : ''}`;
+    case 'author': return `⏳ รอ @${p.author} ${p.hint || 'แก้ไข'}`;
+    case 'reviewers': return '⏳ รอ reviewer';
+    case 'others': return `⏳ รอ reviewer คนอื่น · ${p.hint}`;
+    case 'draft': return p.isMine ? '✏️ งานของคุณ (draft)' : `✏️ @${p.author} ยังทำอยู่`;
+    default: return p.state === 'MERGED' ? '🟣 Merged' : '⚪ Closed';
+  }
+}
+function avatarImg(src, login, cls = '') {
+  return `<img class="${cls}" src="${esc(src || '')}" alt="${esc(login)}" title="${esc(login)}" loading="lazy" onerror="this.style.visibility='hidden'">`;
+}
+function reviewerChips(p) {
+  const chips = p.reviewers.map((r) => {
+    const icon = r.pending ? '⏳' : STATE_ICON[r.state] || '';
+    const label = `${r.login}: ${r.pending ? 'รอรีวิว' : STATE_TEXT[r.state] || ''}${r.bot ? ' (bot)' : ''}`;
+    return `<span class="rv" title="${esc(label)}">${avatarImg(r.avatar, label)}<span class="st">${icon}</span></span>`;
+  });
+  chips.push(...p.teams.map((t) => `<span class="team" title="รอทีม ${esc(t)} รีวิว">⏳ @${esc(t)}</span>`));
+  return chips.join('');
+}
+
+function cardHTML(p) {
+  const now = Date.now();
+  const open = p.lane !== 'done';
+  const waited = now - p.since;
+  const lvl = open && p.turn !== 'draft' ? staleLevel(waited) : '';
+  const ageLabel = p.lane === 'done'
+    ? `${p.state === 'MERGED' ? 'merged' : 'closed'} ${ago(p.closedAt)}`
+    : p.lane === 'draft' ? `เปิดมา ${fmtDur(now - p.createdAt)}` : `ค้าง ${fmtDur(waited)}`;
+  const meta = [`<span class="age ${lvl}" title="อยู่ในสถานะนี้ตั้งแต่ ${esc(fmtDate(p.since))}">⏱ ${ageLabel}</span>`];
+  if (open && p.lane !== 'draft') meta.push(`<span title="เปิดมาทั้งหมด">📅 ${fmtDur(now - p.createdAt)}</span>`);
+  if (p.counted) {
+    const done = p.counted - p.unresolved;
+    meta.push(`<span class="${p.unresolved ? 'pending' : 'ok'}" title="review threads ที่ resolve แล้ว / ทั้งหมด">💬 ${done}/${p.counted} resolved</span>`);
+  }
+  if (p.ci && CI_ICON[p.ci]) { const [i, c, t] = CI_ICON[p.ci]; meta.push(`<span class="${c}" title="${t}">${i} CI</span>`); }
+  if (p.mergeable === 'CONFLICTING' && open) meta.push('<span class="bad" title="มี merge conflict">⚠ conflict</span>');
+  meta.push(`<span title="บรรทัดที่เปลี่ยน"><span class="ok">+${p.additions ?? 0}</span> <span class="bad">−${p.deletions ?? 0}</span></span>`);
+
+  return `<article class="card ${p.turn === 'me' ? 'turn-me' : ''}" data-id="${esc(p.id)}" tabindex="0">
+    <div class="top"><span class="repo" title="${esc(p.repo)}">${esc(p.repo)} #${p.number}</span>
+      <span class="tag ${p.role}">${p.isMine ? 'ของฉัน' : '@' + esc(p.author)}</span></div>
+    <div class="title">${esc(p.title)}</div>
+    <div class="turn ${p.turn === 'me' ? 'me' : ''}">${esc(turnText(p))}</div>
+    <div class="meta">${meta.join('')}</div>
+    ${p.reviewers.length || p.teams.length ? `<div class="reviewers">${reviewerChips(p)}</div>` : ''}
+  </article>`;
+}
+
+function sortCards(a, b) {
+  const ta = a.turn === 'me' ? 0 : 1, tb = b.turn === 'me' ? 0 : 1;
+  if (ta !== tb) return ta - tb;
+  if (a.lane === 'done') return b.closedAt - a.closedAt;
+  return a.since - b.since; // waiting longest first
+}
+
+function filtered() {
+  const q = ui.q.trim().toLowerCase();
+  return state.prs.filter((p) => {
+    if (ui.role !== 'all' && p.role !== ui.role) return false;
+    if (ui.repo && p.repo !== ui.repo) return false;
+    if (ui.myTurn && p.turn !== 'me') return false;
+    if (q) {
+      const hay = `${p.title} #${p.number} ${p.repo} ${p.author} ${p.reviewers.map((r) => r.login).join(' ')}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function render() {
+  renderHeader();
+  renderBanners();
+  const main = $('#main');
+  if (!settings.token && !state.demo) {
+    $('#toolbar').hidden = true;
+    main.innerHTML = `<div class="empty-state">
+      <h2>👋 ยินดีต้อนรับสู่ PR Monitor</h2>
+      <p>บอร์ดสำหรับติดตาม Pull Request บน GitHub ที่คุณ <b>สร้างเอง</b> หรือ <b>ถูกขอให้รีวิว</b> แบ่งเป็น lane ตามสถานะ
+      พร้อมบอกว่าตอนนี้ <b>ถึงตาใคร</b>, คอมเมนต์ resolve ไปกี่อัน และ <b>ค้างมานานแค่ไหน</b></p>
+      <p>เริ่มต้นด้วยการใส่ GitHub Personal Access Token (scope <code>repo</code>)</p>
+      <div class="actions"><button class="primary" data-act="settings">ตั้งค่า token</button><button data-act="demo">ดูตัวอย่าง (demo)</button></div>
+    </div>`;
+    return;
+  }
+  $('#toolbar').hidden = false;
+  if (!state.prs.length && state.loading) { main.innerHTML = '<div class="empty-state"><span class="spin">⟳</span> กำลังโหลด PR...</div>'; return; }
+
+  const prs = filtered();
+  const all = state.prs;
+  $('#cTurn').textContent = all.filter((p) => p.turn === 'me').length;
+  $('#cStale').textContent = all.filter((p) => p.lane !== 'done' && p.turn !== 'draft' && staleLevel(Date.now() - p.since) === 'danger').length;
+  $('#cMine').textContent = all.filter((p) => p.isMine && p.lane !== 'done').length;
+  $('#cReview').textContent = all.filter((p) => !p.isMine && p.lane !== 'done').length;
+  $('#chipTurn').classList.toggle('active', ui.myTurn);
+
+  const repos = [...new Set(all.map((p) => p.repo))].sort();
+  const sel = $('#fRepo');
+  sel.innerHTML = '<option value="">ทุก repo</option>' + repos.map((r) => `<option ${r === ui.repo ? 'selected' : ''}>${esc(r)}</option>`).join('');
+  $('#fRole').value = ui.role;
+  $('#fSwim').checked = ui.swim;
+  if ($('#fQ') !== document.activeElement) $('#fQ').value = ui.q;
+
+  const lanes = LANES.filter((l) => l.id !== 'done' || settings.doneDays > 0 || state.demo);
+  const rows = ui.swim
+    ? SWIMLANES.filter((s) => ui.role === 'all' || ui.role === s.id).map((s) => ({ ...s, prs: prs.filter((p) => p.role === s.id) }))
+    : [{ id: 'all', title: null, prs }];
+
+  let html = `<div class="board-wrap"><div class="board" style="grid-template-columns: repeat(${lanes.length}, minmax(260px, 1fr))">`;
+  for (const l of lanes) {
+    const n = prs.filter((p) => p.lane === l.id).length;
+    html += `<div class="lane-head" style="--lane-color:${l.color}"><div class="inner"><div class="t"><span>${l.title}</span><span>${n}</span></div><div class="d">${l.desc}</div></div></div>`;
+  }
+  for (const row of rows) {
+    if (row.title) html += `<div class="swim-head"><span>${row.title} (${row.prs.filter((p) => p.lane !== 'done').length})</span></div>`;
+    for (const l of lanes) {
+      const cards = row.prs.filter((p) => p.lane === l.id).sort(sortCards);
+      html += `<div class="cell ${cards.length ? '' : 'empty'}">${cards.map(cardHTML).join('')}</div>`;
+    }
+  }
+  html += '</div></div>';
+  if (!state.loading && !all.length && !state.error) html = '<div class="empty-state">🎉 ไม่มี PR ที่เกี่ยวข้องกับคุณตอนนี้</div>';
+  main.innerHTML = html;
+}
+
+function renderHeader() {
+  const me = state.me;
+  $('#me').innerHTML = me ? `${avatarImg(me.avatarUrl, me.login, 'avatar')} ${esc(me.login)}${state.demo ? ' (demo)' : ''}` : '';
+  let s = state.loading ? '<span class="spin">⟳</span> กำลังโหลด...' : state.fetchedAt ? `อัปเดตล่าสุด ${new Date(state.fetchedAt).toLocaleTimeString('th-TH')}` : '';
+  if (state.rate && !state.loading) s += ` · API เหลือ ${state.rate.remaining}/${state.rate.limit}`;
+  $('#status').innerHTML = s;
+  const turns = state.prs.filter((p) => p.turn === 'me').length;
+  document.title = turns ? `(${turns}) PR Monitor` : 'PR Monitor';
+}
+
+function renderBanners() {
+  const b = [];
+  if (state.error) b.push(`<div class="banner error">⚠️ ${esc(state.error)}</div>`);
+  if (state.warnings.length) {
+    const sso = state.warnings.some((w) => /SAML|SSO/i.test(w));
+    b.push(`<div class="banner warn">บางส่วนโหลดไม่ได้: ${esc(state.warnings.slice(0, 2).join('; '))}${sso ? ' — ไปที่หน้า token แล้วกด “Configure SSO” เพื่อ authorize org' : ''}</div>`);
+  }
+  if (state.demo) b.push('<div class="banner warn">กำลังแสดงข้อมูลตัวอย่าง (demo) — กด ⚙️ ตั้งค่า เพื่อใส่ token และดู PR จริงของคุณ</div>');
+  $('#banners').innerHTML = b.join('');
+}
+
+function showDetail(id) {
+  const p = state.prs.find((x) => x.id === id);
+  if (!p) return;
+  const lane = LANES.find((l) => l.id === p.lane);
+  const unresolved = p.threads.filter((t) => !t.resolved).sort((a, b) => a.createdAt - b.createdAt);
+  const resolved = p.threads.length - unresolved.length;
+  const facts = [
+    ['สถานะ', `${lane.title} · ${esc(turnText(p))}`],
+    ['อยู่ในสถานะนี้', p.lane === 'done' ? '—' : `${fmtDur(Date.now() - p.since)} (ตั้งแต่ ${fmtDate(p.since)})`],
+    ['เปิดเมื่อ', `${fmtDate(p.createdAt)} (${ago(p.createdAt)})`],
+    ['Push ล่าสุด', `${fmtDate(p.lastPushAt)} (${ago(p.lastPushAt)})`],
+    ['รีวิว/คอมเมนต์ล่าสุด', p.lastFeedbackAt ? `${fmtDate(p.lastFeedbackAt)} (${ago(p.lastFeedbackAt)})` : 'ยังไม่มี'],
+    ['Review threads', `${resolved}/${p.threads.length} resolved${p.awaitingAuthor ? ` · ${p.awaitingAuthor} รอ author ตอบ/แก้` : ''}${p.authorReplied ? ` · ${p.authorReplied} author ตอบแล้ว รอ reviewer` : ''}`],
+    ['คอมเมนต์ทั่วไป', p.comments],
+    ['Branch', `<code>${esc(p.head)}</code> → <code>${esc(p.base)}</code>`],
+    ['การเปลี่ยนแปลง', `<span class="ok">+${p.additions}</span> <span class="bad">−${p.deletions}</span> · ${p.changedFiles} ไฟล์ · ${p.commits} commits`],
+    ['CI / Merge', `${p.ci ? (CI_ICON[p.ci]?.[2] || p.ci) : 'ไม่มี CI'}${p.mergeable === 'CONFLICTING' ? ' · <span class="bad">มี conflict</span>' : ''}`],
+  ];
+  if (p.lane === 'done') facts.splice(1, 1, [p.state === 'MERGED' ? 'Merged' : 'Closed', `${fmtDate(p.closedAt)} · ใช้เวลา ${fmtDur(p.closedAt - p.createdAt)}`]);
+
+  const reviewers = p.reviewers.map((r) => `<li>${avatarImg(r.avatar, r.login, 'avatar')}<div class="grow"><b>${esc(r.login)}</b>${r.bot ? ' <span class="tag">bot</span>' : ''}<br>
+    <span class="snippet">${r.state ? `${STATE_ICON[r.state]} ${STATE_TEXT[r.state]} · ${ago(r.lastAt)}` : 'ยังไม่ได้รีวิว'}${r.pending ? ` · ⏳ ถูกขอให้รีวิว${r.state ? 'ซ้ำ' : ''}` : ''}</span></div></li>`)
+    .concat(p.teams.map((t) => `<li>👥<div class="grow"><b>@${esc(t)}</b><br><span class="snippet">⏳ รอทีมรีวิว</span></div></li>`));
+
+  const threadItems = unresolved.map((t) => {
+    const whose = eq(t.lastBy, p.author) ? `↩️ @${esc(p.author)} ตอบแล้ว รอ reviewer` : `⏳ รอ @${esc(p.author)} ตอบ/แก้`;
+    return `<li>${avatarImg(t.starterAvatar, t.starter, 'avatar')}<div class="grow">
+      <div><b>${esc(t.starter || '?')}</b> · <code>${esc(t.path || '')}</code> · ${ago(t.createdAt)}${t.outdated ? ' · <span class="tag">outdated</span>' : ''}${t.starterBot ? ' · <span class="tag">bot</span>' : ''}</div>
+      <div class="snippet">${esc(t.body)}</div>
+      <div class="snippet">${whose} · ${t.count} ข้อความ · ล่าสุด ${ago(t.lastAt)} · <a href="${esc(t.url)}" target="_blank" rel="noopener">เปิดดู ↗</a></div>
+    </div></li>`;
+  });
+
+  const dlg = $('#dlgPR');
+  dlg.innerHTML = `<div class="dlg-head"><div><div class="status-line">${esc(p.repo)} #${p.number} · by @${esc(p.author)}</div>
+      <h3><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)} ↗</a></h3></div>
+      <button data-act="close">✕</button></div>
+    <div class="dlg-body">
+      <dl class="facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+      <h4>Reviewers</h4>${reviewers.length ? `<ul class="list">${reviewers.join('')}</ul>` : '<div class="status-line">ยังไม่มี reviewer</div>'}
+      <h4>คอมเมนต์ที่ยังไม่ resolve (${unresolved.length})</h4>${threadItems.length ? `<ul class="list">${threadItems.join('')}</ul>` : '<div class="status-line">ไม่มี 🎉</div>'}
+    </div>`;
+  dlg.showModal();
+}
+
+/* ---------- Load / refresh ---------- */
+
+async function refresh() {
+  if (state.loading) return;
+  if (state.demo) { loadDemo(); return; }
+  if (!settings.token) { render(); return; }
+  state.loading = true; state.error = null; state.warnings = [];
+  render();
+  try {
+    const items = await fetchFromGitHub();
+    state.prs = items.map(({ node, src }) => analyze(node, state.me.login, src));
+    state.fetchedAt = Date.now();
+    maybeNotify();
+  } catch (e) {
+    state.error = e.message || String(e);
+  } finally {
+    state.loading = false;
+    render();
+  }
+}
+
+function maybeNotify() {
+  const ids = new Set(state.prs.filter((p) => p.turn === 'me').map((p) => p.id));
+  if (knownTurnIds && settings.notify && 'Notification' in window && Notification.permission === 'granted') {
+    const fresh = state.prs.filter((p) => ids.has(p.id) && !knownTurnIds.has(p.id));
+    for (const p of fresh.slice(0, 5)) {
+      const n = new Notification(`🔥 ถึงตาคุณ: ${p.repo} #${p.number}`, { body: `${p.title}\n${p.hint}`, tag: p.id });
+      n.onclick = () => { window.focus(); showDetail(p.id); };
+    }
+  }
+  knownTurnIds = ids;
+}
+
+function scheduleRefresh() {
+  clearInterval(refreshTimer);
+  if (settings.refreshMin > 0) refreshTimer = setInterval(() => { if (!document.hidden) refresh(); }, settings.refreshMin * 60e3);
+}
+
+/* ---------- Demo data ---------- */
+
+function demoAvatar(login) {
+  const hue = [...login].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="hsl(${hue},55%,50%)"/><text x="16" y="21" font-size="15" text-anchor="middle" fill="#fff" font-family="sans-serif">${login[0].toUpperCase()}</text></svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+function loadDemo() {
+  state.demo = true;
+  state.me = { login: 'you', avatarUrl: demoAvatar('you') };
+  const iso = (h) => new Date(Date.now() - h * H).toISOString();
+  const user = (l) => ({ __typename: /\[bot\]$/.test(l) ? 'Bot' : 'User', login: l, avatarUrl: demoAvatar(l) });
+  let seq = 0;
+  const mk = (o) => {
+    const author = o.author || 'you';
+    const node = {
+      id: `demo${++seq}`, number: o.number, title: o.title, url: 'https://github.com/', isDraft: !!o.draft,
+      state: o.state || 'OPEN', merged: o.state === 'MERGED', mergedAt: o.state === 'MERGED' ? iso(o.closedH) : null,
+      closedAt: o.closedH != null ? iso(o.closedH) : null, createdAt: iso(o.age), updatedAt: iso(1),
+      additions: o.add ?? 120, deletions: o.del ?? 30, changedFiles: o.files ?? 4, mergeable: o.conflict ? 'CONFLICTING' : 'MERGEABLE',
+      reviewDecision: o.decision ?? null, headRefName: o.head || 'feature/x', baseRefName: 'main',
+      author: user(author), repository: { nameWithOwner: o.repo || 'acme/web-app' },
+      reviewRequests: { nodes: (o.requests || []).map((r) => ({ requestedReviewer: r.startsWith('@') ? { __typename: 'Team', slug: r.slice(1), name: r.slice(1) } : user(r) })) },
+      reviews: { nodes: (o.reviews || []).map(([by, st, h]) => ({ author: user(by), state: st, submittedAt: iso(h) })) },
+      reviewThreads: { totalCount: (o.threads || []).length, nodes: (o.threads || []).map((t) => ({
+        isResolved: !!t.resolved, isOutdated: !!t.outdated, path: t.path || 'src/app.ts',
+        firstComment: { totalCount: t.n || 1, nodes: [{ author: user(t.by), bodyText: t.body, createdAt: iso(t.h), url: 'https://github.com/' }] },
+        lastComment: { nodes: [{ author: user(t.lastBy || t.by), createdAt: iso(t.lastH ?? t.h) }] },
+      })) },
+      comments: { totalCount: o.comments || 0 },
+      commits: { totalCount: o.commits || 3, nodes: [{ commit: { committedDate: iso(o.pushH ?? o.age), statusCheckRollup: { state: o.ci || 'SUCCESS' } } }] },
+      timelineItems: { nodes: [
+        ...(o.requested || []).map(([who, h]) => ({ __typename: 'ReviewRequestedEvent', createdAt: iso(h), requestedReviewer: who.startsWith('@') ? { __typename: 'Team', slug: who.slice(1) } : { __typename: 'User', login: who } })),
+        ...(o.forcePushH != null ? [{ __typename: 'HeadRefForcePushedEvent', createdAt: iso(o.forcePushH) }] : []),
+      ] },
+    };
+    return { node, src: new Set(o.src || [author === 'you' ? 'authored' : 'requested']) };
+  };
+  const items = [
+    mk({ number: 412, title: 'WIP: ย้าย auth ไปใช้ OAuth2 PKCE', draft: true, age: 30, repo: 'acme/api' }),
+    mk({ number: 418, title: 'เพิ่มหน้า export รายงานเป็น CSV', age: 80, requests: ['alice', 'bob'], requested: [['alice', 80], ['bob', 80]] }),
+    mk({ number: 405, title: 'แก้ race condition ตอน refresh token', age: 120, pushH: 100, repo: 'acme/api', decision: 'CHANGES_REQUESTED',
+      reviews: [['alice', 'CHANGES_REQUESTED', 20], ['alice', 'COMMENTED', 19]],
+      threads: [
+        { by: 'alice', h: 20, body: 'ตรงนี้ควรใช้ mutex ไม่งั้นจะยัง race อยู่', path: 'src/auth/refresh.ts' },
+        { by: 'alice', h: 19, body: 'ช่วยเพิ่ม test case ตอน token หมดอายุพร้อมกัน 2 request', path: 'test/refresh.test.ts' },
+        { by: 'alice', h: 20, body: 'ชื่อตัวแปรนี้สับสน', resolved: true, lastBy: 'you', lastH: 10 },
+      ] }),
+    mk({ number: 399, title: 'ปรับ query dashboard ให้เร็วขึ้น (N+1)', age: 200, pushH: 6, decision: 'CHANGES_REQUESTED', repo: 'acme/web-app',
+      reviews: [['bob', 'CHANGES_REQUESTED', 30]], requests: ['bob'], requested: [['bob', 6]],
+      threads: [
+        { by: 'bob', h: 30, body: 'ยังมี N+1 ใน loop ของ orders', lastBy: 'you', lastH: 6, n: 2 },
+        { by: 'bob', h: 30, body: 'ใส่ index ที่ created_at ด้วย', resolved: true, lastBy: 'you', lastH: 6, n: 2 },
+      ] }),
+    mk({ number: 377, title: 'อัปเกรด React เป็น v19', age: 150, pushH: 50, decision: 'APPROVED', reviews: [['carol', 'APPROVED', 8], ['bob', 'APPROVED', 12]],
+      threads: [{ by: 'carol', h: 40, body: 'เช็ค StrictMode ด้วย', resolved: true, lastBy: 'you', lastH: 30, n: 2 }] }),
+    mk({ number: 421, title: 'Dark mode สำหรับหน้า settings', age: 60, conflict: true, ci: 'FAILURE', requests: ['@frontend'], requested: [['@frontend', 60]] }),
+    mk({ number: 233, title: 'เพิ่ม rate limit ให้ public API', author: 'dave', age: 100, repo: 'acme/api', requests: ['you'], requested: [['you', 98]] }),
+    mk({ number: 240, title: 'Refactor payment service', author: 'erin', age: 70, repo: 'acme/payments', requests: ['you'], requested: [['you', 5]],
+      reviews: [['you', 'CHANGES_REQUESTED', 40]], pushH: 6,
+      threads: [{ by: 'you', h: 40, body: 'ควรแยก retry logic ออกมา', lastBy: 'erin', lastH: 6, n: 2 }] }),
+    mk({ number: 245, title: 'เพิ่ม feature flag สำหรับ checkout ใหม่', author: 'frank', age: 90, src: ['reviewed'], pushH: 60,
+      reviews: [['you', 'CHANGES_REQUESTED', 50]], decision: 'CHANGES_REQUESTED',
+      threads: [
+        { by: 'you', h: 50, body: 'flag นี้ต้อง default เป็น off', path: 'config/flags.yml' },
+        { by: 'you', h: 50, body: 'ลืมลบ console.log', path: 'src/checkout.tsx' },
+      ] }),
+    mk({ number: 251, title: 'Migrate cron jobs ไป queue', author: 'gina', age: 40, src: ['reviewed'], repo: 'acme/api', pushH: 3,
+      reviews: [['you', 'COMMENTED', 20]], threads: [{ by: 'you', h: 20, body: 'ถ้า job fail จะ retry กี่ครั้ง?', lastBy: 'gina', lastH: 3, n: 2 }] }),
+    mk({ number: 260, title: 'ปรับ copy หน้า onboarding', author: 'hana', age: 30, src: ['reviewed'], requests: ['bob'], requested: [['bob', 30]],
+      reviews: [['you', 'APPROVED', 10], ['copilot[bot]', 'COMMENTED', 29]],
+      threads: [{ by: 'copilot[bot]', h: 29, body: 'Consider extracting this string to i18n.' }] }),
+    mk({ number: 365, title: 'แก้ timezone ในรายงานรายเดือน', age: 200, state: 'MERGED', closedH: 20, reviews: [['alice', 'APPROVED', 30]], src: ['done'] }),
+    mk({ number: 228, title: 'ลบ endpoint v1 ที่ไม่ใช้แล้ว', author: 'dave', age: 300, repo: 'acme/api', state: 'MERGED', closedH: 50, reviews: [['you', 'APPROVED', 60]], src: ['done'] }),
+    mk({ number: 230, title: 'ทดลอง cache layer (ยกเลิก)', author: 'erin', age: 400, repo: 'acme/payments', state: 'CLOSED', closedH: 100, reviews: [['you', 'COMMENTED', 200]], src: ['done'] }),
+  ];
+  state.prs = items.map(({ node, src }) => analyze(node, 'you', src));
+  state.fetchedAt = Date.now();
+  state.error = null; state.warnings = [];
+  render();
+}
+
+/* ---------- Settings ---------- */
+
+function openSettings() {
+  const f = $('#settingsForm');
+  for (const [k, v] of Object.entries(settings)) {
+    const el = f.elements[k];
+    if (!el) continue;
+    if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
+  }
+  $('#dlgSettings').showModal();
+}
+$('#dlgSettings').addEventListener('close', () => {
+  if ($('#dlgSettings').returnValue !== 'save') return;
+  const f = $('#settingsForm');
+  const next = { ...settings };
+  for (const k of Object.keys(DEFAULTS)) {
+    const el = f.elements[k];
+    if (!el) continue;
+    if (el.type === 'checkbox') next[k] = el.checked;
+    else if (el.type === 'number') next[k] = Math.max(0, Number(el.value) || 0);
+    else next[k] = el.value.trim();
+  }
+  const tokenChanged = next.token !== settings.token;
+  settings = next;
+  store.set(SETTINGS_KEY, settings);
+  if (settings.notify && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+  if (tokenChanged) { state.me = null; state.prs = []; knownTurnIds = null; }
+  if (settings.token) state.demo = false;
+  scheduleRefresh();
+  state.demo ? loadDemo() : refresh();
+});
+$('#btnClearToken').addEventListener('click', () => {
+  $('#settingsForm').elements.token.value = '';
+});
+
+/* ---------- Events ---------- */
+
+function saveUI() { store.set(UI_KEY, { role: ui.role, repo: ui.repo, myTurn: ui.myTurn, swim: ui.swim }); }
+$('#btnRefresh').addEventListener('click', refresh);
+$('#btnSettings').addEventListener('click', openSettings);
+$('#chipTurn').addEventListener('click', () => { ui.myTurn = !ui.myTurn; saveUI(); render(); });
+$('#fRole').addEventListener('change', (e) => { ui.role = e.target.value; saveUI(); render(); });
+$('#fRepo').addEventListener('change', (e) => { ui.repo = e.target.value; saveUI(); render(); });
+$('#fSwim').addEventListener('change', (e) => { ui.swim = e.target.checked; saveUI(); render(); });
+$('#fQ').addEventListener('input', (e) => { ui.q = e.target.value; render(); });
+document.addEventListener('click', (e) => {
+  const act = e.target.closest('[data-act]')?.dataset.act;
+  if (act === 'settings') return openSettings();
+  if (act === 'demo') return loadDemo();
+  if (act === 'close') return e.target.closest('dialog').close();
+  if (e.target.closest('a')) return;
+  const card = e.target.closest('.card');
+  if (card) showDetail(card.dataset.id);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.target.matches('input, select, textarea') || document.querySelector('dialog[open]')) return;
+  if (e.key === 'Enter' && e.target.classList?.contains('card')) showDetail(e.target.dataset.id);
+  if (e.key === 'r' && !e.metaKey && !e.ctrlKey) refresh();
+});
+$('#dlgPR').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && settings.token && !state.demo && state.fetchedAt && settings.refreshMin > 0
+      && Date.now() - state.fetchedAt > settings.refreshMin * 60e3) refresh();
+});
+setInterval(() => { if (state.prs.length && !document.querySelector('dialog[open]')) render(); }, 60e3); // keep ages fresh
+
+/* ---------- Start ---------- */
+
+if (new URLSearchParams(location.search).has('demo')) loadDemo();
+else { render(); refresh(); }
+scheduleRefresh();
+</script>
+</body>
+</html>
