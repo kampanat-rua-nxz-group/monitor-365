@@ -1,0 +1,715 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T16:38:53+00:00",
+  "title": "Design System: PR Monitor",
+  "extensions": {
+    "colorMeta": {
+      "case": {
+        "role": "neutral",
+        "displayName": "Clock Case",
+        "canonical": "#1b201b",
+        "cssVar": "--case",
+        "dark": "#0b0d0b",
+        "oklch": "oklch(23.7% 0.012 145.2)",
+        "tonalRamp": [
+          "oklch(15% 0.012 145.2)",
+          "oklch(26% 0.012 145.2)",
+          "oklch(38% 0.012 145.2)",
+          "oklch(50% 0.012 145.2)",
+          "oklch(62% 0.012 145.2)",
+          "oklch(74% 0.012 145.2)",
+          "oklch(85% 0.012 145.2)",
+          "oklch(95% 0.012 145.2)"
+        ]
+      },
+      "case-raised": {
+        "role": "neutral",
+        "displayName": "Raised Case",
+        "canonical": "#262c25",
+        "cssVar": "--case-2",
+        "dark": "#1a1e19",
+        "oklch": "oklch(28.5% 0.015 141.2)",
+        "tonalRamp": [
+          "oklch(15% 0.015 141.2)",
+          "oklch(26% 0.015 141.2)",
+          "oklch(38% 0.015 141.2)",
+          "oklch(50% 0.015 141.2)",
+          "oklch(62% 0.015 141.2)",
+          "oklch(74% 0.015 141.2)",
+          "oklch(85% 0.015 141.2)",
+          "oklch(95% 0.015 141.2)"
+        ]
+      },
+      "case-hover": {
+        "role": "neutral",
+        "displayName": "Case Hover",
+        "canonical": "#303730",
+        "cssVar": "--case-3",
+        "dark": "#232822",
+        "oklch": "oklch(32.8% 0.015 145.2)",
+        "tonalRamp": [
+          "oklch(15% 0.015 145.2)",
+          "oklch(26% 0.015 145.2)",
+          "oklch(38% 0.015 145.2)",
+          "oklch(50% 0.015 145.2)",
+          "oklch(62% 0.015 145.2)",
+          "oklch(74% 0.015 145.2)",
+          "oklch(85% 0.015 145.2)",
+          "oklch(95% 0.015 145.2)"
+        ]
+      },
+      "case-line": {
+        "role": "neutral",
+        "displayName": "Case Line",
+        "canonical": "#3a4238",
+        "cssVar": "--case-line",
+        "dark": "#2c3329",
+        "oklch": "oklch(36.8% 0.020 139.4)",
+        "tonalRamp": [
+          "oklch(15% 0.020 139.4)",
+          "oklch(26% 0.020 139.4)",
+          "oklch(38% 0.020 139.4)",
+          "oklch(50% 0.020 139.4)",
+          "oklch(62% 0.020 139.4)",
+          "oklch(74% 0.020 139.4)",
+          "oklch(85% 0.020 139.4)",
+          "oklch(95% 0.020 139.4)"
+        ]
+      },
+      "case-text": {
+        "role": "neutral",
+        "displayName": "Case Text",
+        "canonical": "#eef1ea",
+        "cssVar": "--case-text",
+        "dark": "#e8ece3",
+        "oklch": "oklch(95.4% 0.010 125.7)",
+        "tonalRamp": [
+          "oklch(15% 0.010 125.7)",
+          "oklch(26% 0.010 125.7)",
+          "oklch(38% 0.010 125.7)",
+          "oklch(50% 0.010 125.7)",
+          "oklch(62% 0.010 125.7)",
+          "oklch(74% 0.010 125.7)",
+          "oklch(85% 0.010 125.7)",
+          "oklch(95% 0.010 125.7)"
+        ]
+      },
+      "case-muted": {
+        "role": "neutral",
+        "displayName": "Case Muted",
+        "canonical": "#a9b2a4",
+        "cssVar": "--case-muted",
+        "dark": "#9aa494",
+        "oklch": "oklch(75.2% 0.022 134.1)",
+        "tonalRamp": [
+          "oklch(15% 0.022 134.1)",
+          "oklch(26% 0.022 134.1)",
+          "oklch(38% 0.022 134.1)",
+          "oklch(50% 0.022 134.1)",
+          "oklch(62% 0.022 134.1)",
+          "oklch(74% 0.022 134.1)",
+          "oklch(85% 0.022 134.1)",
+          "oklch(95% 0.022 134.1)"
+        ]
+      },
+      "board-ground": {
+        "role": "neutral",
+        "displayName": "Board Ground",
+        "canonical": "#e7eae2",
+        "cssVar": "--ground",
+        "dark": "#20251f",
+        "oklch": "oklch(93.3% 0.011 123.5)",
+        "tonalRamp": [
+          "oklch(15% 0.011 123.5)",
+          "oklch(26% 0.011 123.5)",
+          "oklch(38% 0.011 123.5)",
+          "oklch(50% 0.011 123.5)",
+          "oklch(62% 0.011 123.5)",
+          "oklch(74% 0.011 123.5)",
+          "oklch(85% 0.011 123.5)",
+          "oklch(95% 0.011 123.5)"
+        ]
+      },
+      "lane": {
+        "role": "neutral",
+        "displayName": "Lane",
+        "canonical": "#dce0d5",
+        "cssVar": "--lane",
+        "dark": "#272d26",
+        "oklch": "oklch(90.1% 0.015 123.1)",
+        "tonalRamp": [
+          "oklch(15% 0.015 123.1)",
+          "oklch(26% 0.015 123.1)",
+          "oklch(38% 0.015 123.1)",
+          "oklch(50% 0.015 123.1)",
+          "oklch(62% 0.015 123.1)",
+          "oklch(74% 0.015 123.1)",
+          "oklch(85% 0.015 123.1)",
+          "oklch(95% 0.015 123.1)"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card",
+        "canonical": "#fbfcf9",
+        "cssVar": "--card",
+        "dark": "#2e352d",
+        "oklch": "oklch(98.9% 0.004 121.6)",
+        "tonalRamp": [
+          "oklch(15% 0.004 121.6)",
+          "oklch(26% 0.004 121.6)",
+          "oklch(38% 0.004 121.6)",
+          "oklch(50% 0.004 121.6)",
+          "oklch(62% 0.004 121.6)",
+          "oklch(74% 0.004 121.6)",
+          "oklch(85% 0.004 121.6)",
+          "oklch(95% 0.004 121.6)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "#c9cfc1",
+        "cssVar": "--line",
+        "dark": "#343c32",
+        "oklch": "oklch(84.6% 0.020 125.9)",
+        "tonalRamp": [
+          "oklch(15% 0.020 125.9)",
+          "oklch(26% 0.020 125.9)",
+          "oklch(38% 0.020 125.9)",
+          "oklch(50% 0.020 125.9)",
+          "oklch(62% 0.020 125.9)",
+          "oklch(74% 0.020 125.9)",
+          "oklch(85% 0.020 125.9)",
+          "oklch(95% 0.020 125.9)"
+        ]
+      },
+      "line-soft": {
+        "role": "neutral",
+        "displayName": "Line Soft",
+        "canonical": "#e0e4da",
+        "cssVar": "--line-soft",
+        "dark": "#2a3128",
+        "oklch": "oklch(91.3% 0.014 124.6)",
+        "tonalRamp": [
+          "oklch(15% 0.014 124.6)",
+          "oklch(26% 0.014 124.6)",
+          "oklch(38% 0.014 124.6)",
+          "oklch(50% 0.014 124.6)",
+          "oklch(62% 0.014 124.6)",
+          "oklch(74% 0.014 124.6)",
+          "oklch(85% 0.014 124.6)",
+          "oklch(95% 0.014 124.6)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#1a1f19",
+        "cssVar": "--text",
+        "dark": "#e4e8df",
+        "oklch": "oklch(23.2% 0.014 140.4)",
+        "tonalRamp": [
+          "oklch(15% 0.014 140.4)",
+          "oklch(26% 0.014 140.4)",
+          "oklch(38% 0.014 140.4)",
+          "oklch(50% 0.014 140.4)",
+          "oklch(62% 0.014 140.4)",
+          "oklch(74% 0.014 140.4)",
+          "oklch(85% 0.014 140.4)",
+          "oklch(95% 0.014 140.4)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#556050",
+        "cssVar": "--muted",
+        "dark": "#a3ac9d",
+        "oklch": "oklch(47.5% 0.029 135.8)",
+        "tonalRamp": [
+          "oklch(15% 0.029 135.8)",
+          "oklch(26% 0.029 135.8)",
+          "oklch(38% 0.029 135.8)",
+          "oklch(50% 0.029 135.8)",
+          "oklch(62% 0.029 135.8)",
+          "oklch(74% 0.029 135.8)",
+          "oklch(85% 0.029 135.8)",
+          "oklch(95% 0.029 135.8)"
+        ]
+      },
+      "faint": {
+        "role": "neutral",
+        "displayName": "Faint",
+        "canonical": "#5a6556",
+        "cssVar": "--faint",
+        "dark": "#9aa394",
+        "oklch": "oklch(49.3% 0.027 137.3)",
+        "tonalRamp": [
+          "oklch(15% 0.027 137.3)",
+          "oklch(26% 0.027 137.3)",
+          "oklch(38% 0.027 137.3)",
+          "oklch(50% 0.027 137.3)",
+          "oklch(62% 0.027 137.3)",
+          "oklch(74% 0.027 137.3)",
+          "oklch(85% 0.027 137.3)",
+          "oklch(95% 0.027 137.3)"
+        ]
+      },
+      "you": {
+        "role": "primary",
+        "displayName": "Lit Clock Amber",
+        "canonical": "#f2b632",
+        "cssVar": "--you",
+        "dark": "#f2b632",
+        "oklch": "oklch(81.1% 0.153 82.1)",
+        "tonalRamp": [
+          "oklch(15% 0.153 82.1)",
+          "oklch(26% 0.153 82.1)",
+          "oklch(38% 0.153 82.1)",
+          "oklch(50% 0.153 82.1)",
+          "oklch(62% 0.153 82.1)",
+          "oklch(74% 0.153 82.1)",
+          "oklch(85% 0.153 82.1)",
+          "oklch(95% 0.153 82.1)"
+        ]
+      },
+      "you-ink": {
+        "role": "primary",
+        "displayName": "Amber Ink",
+        "canonical": "#2a1f05",
+        "cssVar": "--you-ink",
+        "dark": "#231904",
+        "oklch": "oklch(24.6% 0.044 85.9)",
+        "tonalRamp": [
+          "oklch(15% 0.044 85.9)",
+          "oklch(26% 0.044 85.9)",
+          "oklch(38% 0.044 85.9)",
+          "oklch(50% 0.044 85.9)",
+          "oklch(62% 0.044 85.9)",
+          "oklch(74% 0.044 85.9)",
+          "oklch(85% 0.044 85.9)",
+          "oklch(95% 0.044 85.9)"
+        ]
+      },
+      "you-soft": {
+        "role": "primary",
+        "displayName": "Amber Wash",
+        "canonical": "#fbe9bd",
+        "cssVar": "--you-soft",
+        "dark": "#3b3115",
+        "oklch": "oklch(93.8% 0.060 88.4)",
+        "tonalRamp": [
+          "oklch(15% 0.060 88.4)",
+          "oklch(26% 0.060 88.4)",
+          "oklch(38% 0.060 88.4)",
+          "oklch(50% 0.060 88.4)",
+          "oklch(62% 0.060 88.4)",
+          "oklch(74% 0.060 88.4)",
+          "oklch(85% 0.060 88.4)",
+          "oklch(95% 0.060 88.4)"
+        ]
+      },
+      "them": {
+        "role": "secondary",
+        "displayName": "Tournament Green",
+        "canonical": "#3f6f34",
+        "cssVar": "--them",
+        "dark": "#86b977",
+        "oklch": "oklch(49.2% 0.103 139.9)",
+        "tonalRamp": [
+          "oklch(15% 0.103 139.9)",
+          "oklch(26% 0.103 139.9)",
+          "oklch(38% 0.103 139.9)",
+          "oklch(50% 0.103 139.9)",
+          "oklch(62% 0.103 139.9)",
+          "oklch(74% 0.103 139.9)",
+          "oklch(85% 0.103 139.9)",
+          "oklch(95% 0.103 139.9)"
+        ]
+      },
+      "them-soft": {
+        "role": "secondary",
+        "displayName": "Green Wash",
+        "canonical": "#d5e3cb",
+        "cssVar": "--them-soft",
+        "dark": "#263a21",
+        "oklch": "oklch(89.9% 0.035 132.1)",
+        "tonalRamp": [
+          "oklch(15% 0.035 132.1)",
+          "oklch(26% 0.035 132.1)",
+          "oklch(38% 0.035 132.1)",
+          "oklch(50% 0.035 132.1)",
+          "oklch(62% 0.035 132.1)",
+          "oklch(74% 0.035 132.1)",
+          "oklch(85% 0.035 132.1)",
+          "oklch(95% 0.035 132.1)"
+        ]
+      },
+      "them-ink": {
+        "role": "secondary",
+        "displayName": "Deep Board Green",
+        "canonical": "#21401a",
+        "cssVar": "--them-ink",
+        "dark": "#c4e2b7",
+        "oklch": "oklch(33.7% 0.073 140.0)",
+        "tonalRamp": [
+          "oklch(15% 0.073 140.0)",
+          "oklch(26% 0.073 140.0)",
+          "oklch(38% 0.073 140.0)",
+          "oklch(50% 0.073 140.0)",
+          "oklch(62% 0.073 140.0)",
+          "oklch(74% 0.073 140.0)",
+          "oklch(85% 0.073 140.0)",
+          "oklch(95% 0.073 140.0)"
+        ]
+      },
+      "flag": {
+        "role": "tertiary",
+        "displayName": "Flag Red",
+        "canonical": "#c23b2a",
+        "cssVar": "--flag",
+        "dark": "#d9483a",
+        "oklch": "oklch(54.9% 0.174 30.5)",
+        "tonalRamp": [
+          "oklch(15% 0.160 30.5)",
+          "oklch(26% 0.160 30.5)",
+          "oklch(38% 0.160 30.5)",
+          "oklch(50% 0.160 30.5)",
+          "oklch(62% 0.160 30.5)",
+          "oklch(74% 0.160 30.5)",
+          "oklch(85% 0.160 30.5)",
+          "oklch(95% 0.160 30.5)"
+        ]
+      },
+      "flag-soft": {
+        "role": "tertiary",
+        "displayName": "Flag Wash",
+        "canonical": "#f6dcd6",
+        "cssVar": "--flag-soft",
+        "dark": "#3c201b",
+        "oklch": "oklch(91.4% 0.030 33.1)",
+        "tonalRamp": [
+          "oklch(15% 0.030 33.1)",
+          "oklch(26% 0.030 33.1)",
+          "oklch(38% 0.030 33.1)",
+          "oklch(50% 0.030 33.1)",
+          "oklch(62% 0.030 33.1)",
+          "oklch(74% 0.030 33.1)",
+          "oklch(85% 0.030 33.1)",
+          "oklch(95% 0.030 33.1)"
+        ]
+      },
+      "ok": {
+        "role": "tertiary",
+        "displayName": "Pass Green",
+        "canonical": "#2f7a3b",
+        "cssVar": "--ok",
+        "dark": "#7cc585",
+        "oklch": "oklch(51.7% 0.121 146.6)",
+        "tonalRamp": [
+          "oklch(15% 0.121 146.6)",
+          "oklch(26% 0.121 146.6)",
+          "oklch(38% 0.121 146.6)",
+          "oklch(50% 0.121 146.6)",
+          "oklch(62% 0.121 146.6)",
+          "oklch(74% 0.121 146.6)",
+          "oklch(85% 0.121 146.6)",
+          "oklch(95% 0.121 146.6)"
+        ]
+      },
+      "bad": {
+        "role": "tertiary",
+        "displayName": "Fail Red",
+        "canonical": "#b3372a",
+        "cssVar": "--bad",
+        "dark": "#f08070",
+        "oklch": "oklch(51.9% 0.162 29.6)",
+        "tonalRamp": [
+          "oklch(15% 0.160 29.6)",
+          "oklch(26% 0.160 29.6)",
+          "oklch(38% 0.160 29.6)",
+          "oklch(50% 0.160 29.6)",
+          "oklch(62% 0.160 29.6)",
+          "oklch(74% 0.160 29.6)",
+          "oklch(85% 0.160 29.6)",
+          "oklch(95% 0.160 29.6)"
+        ]
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Caution Ochre",
+        "canonical": "#8a5e00",
+        "cssVar": "--warn",
+        "dark": "#e2b54a",
+        "oklch": "oklch(51.6% 0.108 77.0)",
+        "tonalRamp": [
+          "oklch(15% 0.108 77.0)",
+          "oklch(26% 0.108 77.0)",
+          "oklch(38% 0.108 77.0)",
+          "oklch(50% 0.108 77.0)",
+          "oklch(62% 0.108 77.0)",
+          "oklch(74% 0.108 77.0)",
+          "oklch(85% 0.108 77.0)",
+          "oklch(95% 0.108 77.0)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The Your move count on the case; one per screen."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Welcome heading."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Inspector PR title (dialog head at 16px)."
+      },
+      "title-sm": {
+        "displayName": "Title Small",
+        "purpose": "Brand name and the rail label."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Base text and card titles (1.35 on cards, two-line clamp)."
+      },
+      "body-sm": {
+        "displayName": "Body Small",
+        "purpose": "Inspector facts and lists, notices, form labels."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Refs, metadata, lane descriptions, verbs, counts; pills at 11px."
+      },
+      "clock": {
+        "displayName": "Clock",
+        "purpose": "Running wait on a lit face and rail tile clocks; tabular figures."
+      },
+      "clock-lg": {
+        "displayName": "Clock Large",
+        "purpose": "Wait on the inspector's 44px clock."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Code, file paths and token scopes only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "resting",
+        "value": "0 1px 2px rgba(20,28,18,.07), 0 2px 8px rgba(20,28,18,.05)",
+        "dark": "0 1px 2px rgba(0,0,0,.35)",
+        "purpose": "Cards and the active segmented option; never increases on hover."
+      },
+      {
+        "name": "overlay",
+        "value": "0 8px 32px rgba(15,20,14,.18), 0 2px 6px rgba(15,20,14,.08)",
+        "dark": "0 12px 40px rgba(0,0,0,.55)",
+        "purpose": "Inspector panel and settings dialog only."
+      },
+      {
+        "name": "selected-ring",
+        "value": "0 0 0 1px var(--them)",
+        "purpose": "Selected card, combined with the resting shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state",
+        "value": "150ms ease",
+        "purpose": "Border and background changes on buttons, tiles, cards."
+      },
+      {
+        "name": "clock-face",
+        "value": "200ms ease",
+        "purpose": "Clock face background and colour when the turn or stale level changes."
+      },
+      {
+        "name": "panel",
+        "value": "220ms cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Inspector slide-in from the right."
+      },
+      {
+        "name": "press",
+        "value": "translateY(1px)",
+        "purpose": "Button active state."
+      },
+      {
+        "name": "spin",
+        "value": "900ms linear infinite",
+        "purpose": "Refresh icon while loading."
+      },
+      {
+        "name": "pulse",
+        "value": "1.4s ease-in-out infinite, opacity to .55",
+        "purpose": "Skeleton cards while loading."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "none",
+        "purpose": "prefers-reduced-motion removes all transitions and animations."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "720px",
+        "purpose": "max-width: rail tiles stack, status hides, search full width, gutter 12px."
+      },
+      {
+        "name": "inspector-dock",
+        "value": "1200px",
+        "purpose": "min-width: open inspector pads main so the board stays visible."
+      }
+    ],
+    "icons": {
+      "grid": "24px",
+      "stroke": "1.75px",
+      "linecap": "round",
+      "linejoin": "round",
+      "sizes": [
+        "14px",
+        "16px",
+        "20px"
+      ],
+      "note": "Inline SVG symbols, drawn line glyphs; flag icon filled when the flag has fallen."
+    }
+  },
+  "components": [
+    {
+      "name": "Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Default control on the light ground: card fill, hairline border, border darkens on hover.",
+      "html": "<button class=\"ds-btn\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\"><path d=\"M4 7h9M17 7h3M4 17h3M11 17h9\"/><circle cx=\"15\" cy=\"7\" r=\"2\"/><circle cx=\"9\" cy=\"17\" r=\"2\"/></svg><span>Settings</span></button>",
+      "css": ".ds-btn { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border-radius:6px; border:1px solid var(--line,#c9cfc1); background:var(--card,#fbfcf9); color:var(--text,#1a1f19); font:500 14px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; cursor:pointer; transition:background .15s, border-color .15s; } .ds-btn:hover { border-color:var(--faint,#5a6556); } .ds-btn:active { transform:translateY(1px); } .ds-ic { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Clock-case fill for the one committing action in a form (Save).",
+      "html": "<button class=\"ds-btn-primary\">Save</button>",
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; height:32px; padding:0 12px; border-radius:6px; border:1px solid var(--case,#1b201b); background:var(--case,#1b201b); color:var(--case-text,#eef1ea); font:500 14px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; cursor:pointer; transition:background .15s; } .ds-btn-primary:hover { background:var(--case-3,#303730); } .ds-btn-primary:active { transform:translateY(1px); }"
+    },
+    {
+      "name": "Case Button",
+      "kind": "button",
+      "refersTo": "button-on-case",
+      "description": "Header controls on the dark clock case (refresh, settings).",
+      "html": "<div class=\"ds-case-strip\"><button class=\"ds-btn-case\" aria-label=\"Refresh\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\"><path d=\"M20 12a8 8 0 1 1-2.34-5.66\"/><path d=\"M20 4v5h-5\"/></svg></button><button class=\"ds-btn-case\">Settings</button></div>",
+      "css": ".ds-case-strip { display:flex; gap:8px; padding:12px; background:var(--case,#1b201b); } .ds-btn-case { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:32px; height:32px; padding:0 12px; border-radius:6px; border:1px solid var(--case-line,#3a4238); background:transparent; color:var(--case-text,#eef1ea); font:500 14px/1.45 system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; cursor:pointer; transition:background .15s, border-color .15s; } .ds-btn-case[aria-label] { padding:0; width:32px; } .ds-btn-case:hover { background:var(--case-2,#262c25); border-color:var(--case-muted,#a9b2a4); } .ds-btn-case:focus-visible { outline:2px solid var(--you,#f2b632); outline-offset:2px; } .ds-ic { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }"
+    },
+    {
+      "name": "Segmented Filter",
+      "kind": "chip",
+      "refersTo": "segmented",
+      "description": "Role filter with counts; the active option becomes a card-coloured tab.",
+      "html": "<div class=\"ds-seg\"><button aria-pressed=\"true\">All <span>11</span></button><button aria-pressed=\"false\">Mine <span>6</span></button><button aria-pressed=\"false\">Reviewing <span>5</span></button></div>",
+      "css": ".ds-seg { display:inline-flex; padding:2px; border-radius:7px; background:var(--lane,#dce0d5); border:1px solid var(--line-soft,#e0e4da); } .ds-seg button { height:28px; padding:0 12px; border:0; border-radius:5px; background:transparent; color:var(--muted,#556050); font:500 14px system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; display:inline-flex; gap:6px; align-items:center; cursor:pointer; } .ds-seg button span { color:var(--faint,#5a6556); font-size:12px; font-variant-numeric:tabular-nums; } .ds-seg button:hover { color:var(--text,#1a1f19); } .ds-seg button[aria-pressed=true] { background:var(--card,#fbfcf9); color:var(--text,#1a1f19); box-shadow:0 1px 2px rgba(20,28,18,.07), 0 2px 8px rgba(20,28,18,.05); }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "32px field with a leading drawn search icon.",
+      "html": "<label class=\"ds-search\"><svg viewBox=\"0 0 24 24\"><circle cx=\"11\" cy=\"11\" r=\"6\"/><path d=\"M20 20l-4.5-4.5\"/></svg><input type=\"search\" placeholder=\"Search title, #, person\"></label>",
+      "css": ".ds-search { position:relative; display:inline-flex; align-items:center; } .ds-search svg { position:absolute; left:9px; width:14px; height:14px; fill:none; stroke:var(--faint,#5a6556); stroke-width:1.75; stroke-linecap:round; pointer-events:none; } .ds-search input { height:32px; width:220px; padding:0 10px 0 30px; border-radius:6px; border:1px solid var(--line,#c9cfc1); background:var(--card,#fbfcf9); color:var(--text,#1a1f19); font:400 14px system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; } .ds-search input:hover { border-color:var(--faint,#5a6556); }"
+    },
+    {
+      "name": "Chess Clock",
+      "kind": "custom",
+      "refersTo": "clock",
+      "description": "Signature two-faced clock: the face whose turn it is is lit and shows the running wait; a fallen flag turns it red; done PRs show a dashed stopped clock.",
+      "html": "<div class=\"ds-clocks\"><div class=\"ds-clock\"><span class=\"ds-face ds-lit-you\"><span>You</span><b>19h 00m</b></span><span class=\"ds-face\"><span>Reviewers</span></span></div><div class=\"ds-clock\"><span class=\"ds-face\"><span>You</span></span><span class=\"ds-face ds-lit-them\"><span>@bob</span><b>6h 00m</b></span></div><div class=\"ds-clock\"><span class=\"ds-face ds-lit-flag\"><span>You</span><b><svg viewBox=\"0 0 24 24\"><path d=\"M6 21V4\"/><path d=\"M6 4h11l-2.5 4 2.5 4H6\"/></svg>4d 02h</b></span><span class=\"ds-face\"><span>@dave</span></span></div><div class=\"ds-clock ds-stopped\"><span class=\"ds-face\"><span>Merged</span><b>20h ago</b></span></div></div>",
+      "css": ".ds-clocks { display:grid; gap:8px; width:220px; padding:12px; background:var(--card,#fbfcf9); } .ds-clock { display:flex; height:30px; border:1px solid var(--line,#c9cfc1); border-radius:5px; overflow:hidden; background:var(--card,#fbfcf9); font:400 12px system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; } .ds-face { flex:1 1 auto; display:flex; align-items:center; justify-content:space-between; gap:6px; padding:0 8px; min-width:0; color:var(--faint,#5a6556); transition:background .2s, color .2s; } .ds-face + .ds-face { border-left:1px solid var(--line,#c9cfc1); } .ds-face b { display:inline-flex; align-items:center; gap:4px; font-weight:600; font-size:13px; font-variant-numeric:tabular-nums; white-space:nowrap; } .ds-face svg { width:14px; height:14px; fill:currentColor; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; } .ds-lit-you { background:var(--you,#f2b632); color:var(--you-ink,#2a1f05); } .ds-lit-them { background:var(--them-soft,#d5e3cb); color:var(--them-ink,#21401a); } .ds-lit-flag { background:var(--flag,#c23b2a); color:#fff; } .ds-face[class*=ds-lit] > span { font-weight:500; } .ds-stopped { background:transparent; border-style:dashed; } .ds-stopped .ds-face b { font-weight:500; font-size:12px; }"
+    },
+    {
+      "name": "PR Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Off-white card on a lane: ref, two-line title, chess clock, metadata row.",
+      "html": "<div class=\"ds-lane\"><article class=\"ds-card\" tabindex=\"0\"><div class=\"ds-card-top\">api <b>#405</b></div><h3>Fix race condition on token refresh</h3><div class=\"ds-mini-clock\"><span class=\"ds-on\">You <b>19h 00m</b></span><span>Reviewers</span></div><div class=\"ds-meta\"><span>1/3 threads</span><span class=\"ds-ok\">CI</span><span><i class=\"ds-add\">+120</i> <i class=\"ds-del\">−30</i></span></div></article></div>",
+      "css": ".ds-lane { background:var(--lane,#dce0d5); padding:8px; border-radius:6px; width:240px; font-family:system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; } .ds-card { background:var(--card,#fbfcf9); border:1px solid var(--line-soft,#e0e4da); border-radius:6px; box-shadow:0 1px 2px rgba(20,28,18,.07), 0 2px 8px rgba(20,28,18,.05); padding:10px 12px; display:grid; gap:8px; cursor:pointer; color:var(--text,#1a1f19); transition:border-color .15s, box-shadow .15s; } .ds-card:hover { border-color:var(--line,#c9cfc1); } .ds-card-top { font-size:12px; color:var(--faint,#5a6556); } .ds-card-top b { font-weight:500; color:var(--muted,#556050); } .ds-card h3 { margin:0; font-size:14px; line-height:1.35; font-weight:600; } .ds-mini-clock { display:flex; height:30px; border:1px solid var(--line,#c9cfc1); border-radius:5px; overflow:hidden; font-size:12px; } .ds-mini-clock span { flex:1; display:flex; align-items:center; justify-content:space-between; padding:0 8px; color:var(--faint,#5a6556); } .ds-mini-clock span + span { border-left:1px solid var(--line,#c9cfc1); } .ds-mini-clock .ds-on { background:var(--you,#f2b632); color:var(--you-ink,#2a1f05); font-weight:500; } .ds-mini-clock b { font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; } .ds-meta { display:flex; flex-wrap:wrap; gap:4px 12px; font-size:12px; color:var(--faint,#5a6556); font-variant-numeric:tabular-nums; } .ds-meta i { font-style:normal; } .ds-ok, .ds-add { color:var(--ok,#2f7a3b); } .ds-del { color:var(--bad,#b3372a); }"
+    },
+    {
+      "name": "Your Move Rail Tile",
+      "kind": "custom",
+      "refersTo": "rail-tile",
+      "description": "Raised-case tile in the Your move rail: ref, title, amber verb, and the lit wait; red with a filled flag when overdue.",
+      "html": "<div class=\"ds-rail\"><button class=\"ds-tile\"><span class=\"ds-tile-main\"><span class=\"ds-ref\">acme/api #405</span><span class=\"ds-tile-title\">Fix race condition on token refresh</span><span class=\"ds-verb\">Address feedback</span></span><span class=\"ds-tile-clock\">19h 00m</span></button><button class=\"ds-tile\"><span class=\"ds-tile-main\"><span class=\"ds-ref\">acme/api #233</span><span class=\"ds-tile-title\">Add rate limiting to the public API</span><span class=\"ds-verb\">Review</span></span><span class=\"ds-tile-clock ds-danger\"><svg viewBox=\"0 0 24 24\"><path d=\"M6 21V4\"/><path d=\"M6 4h11l-2.5 4 2.5 4H6\"/></svg>4d 02h</span></button></div>",
+      "css": ".ds-rail { display:grid; gap:8px; padding:16px; background:var(--case,#1b201b); font-family:system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; } .ds-tile { display:flex; align-items:flex-start; gap:12px; text-align:left; padding:10px 10px 10px 12px; border-radius:6px; background:var(--case-2,#262c25); border:1px solid var(--case-line,#3a4238); color:var(--case-text,#eef1ea); cursor:pointer; font:inherit; transition:border-color .15s, background .15s; } .ds-tile:hover { border-color:var(--case-muted,#a9b2a4); background:var(--case-3,#303730); } .ds-tile:focus-visible { outline:2px solid var(--you,#f2b632); outline-offset:2px; } .ds-tile-main { display:grid; gap:2px; flex:1; min-width:0; } .ds-ref { font-size:12px; color:var(--case-muted,#a9b2a4); } .ds-tile-title { font-size:14px; font-weight:600; } .ds-verb { font-size:12px; font-weight:500; color:var(--you,#f2b632); } .ds-tile-clock { align-self:center; display:inline-flex; align-items:center; gap:5px; padding:5px 9px; border-radius:4px; background:var(--you,#f2b632); color:var(--you-ink,#2a1f05); font-weight:600; font-size:13px; font-variant-numeric:tabular-nums; white-space:nowrap; } .ds-tile-clock.ds-danger { background:var(--flag,#c23b2a); color:#fff; } .ds-tile-clock svg { width:14px; height:14px; fill:currentColor; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }"
+    },
+    {
+      "name": "Status Pills",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "Small inspector pills: neutral, waiting on author (amber wash), review requested (green wash).",
+      "html": "<div class=\"ds-pills\"><span class=\"ds-pill\">outdated</span><span class=\"ds-pill ds-author\">Waiting on @dave</span><span class=\"ds-pill ds-reviewer\">Review requested</span></div>",
+      "css": ".ds-pills { display:flex; gap:6px; flex-wrap:wrap; font-family:system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif; } .ds-pill { display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:1px 6px; border-radius:999px; background:var(--lane,#dce0d5); color:var(--muted,#556050); } .ds-author { background:var(--you-soft,#fbe9bd); color:var(--warn,#8a5e00); } .ds-reviewer { background:var(--them-soft,#d5e3cb); color:var(--them-ink,#21401a); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Tournament Clock",
+    "overview": "PR Monitor is a tournament hall seen from the player's chair. A near-black green clock case runs across the top and holds the only thing that matters first: how many games are waiting on your move, and for how long. Below it the board opens onto a pale, board-green ground where every pull request sits as an off-white card with a two-faced chess clock on it, \"You\" on the left and the other side on the right. The face whose turn it is lights up and shows the running wait; when the wait passes the stale threshold, the flag falls and the face turns red; finished games show a stopped clock with a dashed rim.\n\nThe system is dense and quiet, built for a developer checking PRs in rounds on a laptop. It is loud in exactly two places, the user's turn (amber) and fallen flags (red), and calm everywhere else (greens, greys, hairlines). Typography is one system sans with tabular figures so clock digits never jitter. Icons are drawn line glyphs at a 1.75px stroke. The world refuses the default grey kanban of identical cards with emoji badges and a coloured left stripe: state is carried by the clock, not by decoration on the card edge.\n\nLight and dark themes are the same hall under different lighting: in dark mode the case deepens to near-black, the ground and cards become dark felt greens, and the amber lit face keeps its exact value so your clock reads the same in both.",
+    "keyCharacteristics": [
+      "Dark clock case on top, pale board-green ground below; the case holds only the header and the Your move rail.",
+      "A two-faced chess clock on every card; exactly one face is lit, and it carries the wait time.",
+      "Amber means your move; tournament green means theirs; flag red means a fallen flag.",
+      "One system sans, tabular numerals for every time and count, 1.75px stroke line icons, no emoji.",
+      "Flat cards with a hairline border and a whisper of ambient shadow; only overlays lift."
+    ],
+    "rules": [
+      {
+        "name": "The Your Move Rule",
+        "body": "Full-strength amber is reserved for the user's turn: the lit You face, the rail tile clocks, the Your move count and verbs. Outside that, amber appears only as a wash (`you-soft`) or as a small mark on the dark case (brand glyph, demo pill). If amber shows up on the light board and it is not your clock, it is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fallen Flag Rule",
+        "body": "Solid flag red appears only when a wait has passed the danger threshold, and always with the drawn flag icon beside the time. Below the threshold the clock stays amber or green; the warning threshold shows the outline flag icon on the lit face without changing its colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Case Rule",
+        "body": "The dark case holds the header and the Your move rail and nothing else. Everything the user scans rather than acts on lives on the light ground.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Clock Rule",
+        "body": "Every time, count and diff number uses `font-variant-numeric: tabular-nums`. Clock times are 600 weight; everything around them is 400 or 500 so the digits lead.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Voice Rule",
+        "body": "One sans family for everything. Weight carries hierarchy (600 for titles and times, 500 for labels and controls, 400 for prose); no display face, no uppercase labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Felt Table Rule",
+        "body": "Surfaces on the board never lift beyond the resting shadow, including on hover; hover changes the border, not the elevation. Only things that cover the board (inspector, dialog) use the overlay shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** put the user's turn on the dark case: the Your move count at 40px amber, and one rail tile per PR, longest wait first.",
+      "**Do** give every open PR card a two-faced clock with exactly one face lit, and show the wait on the lit face only.",
+      "**Do** use tabular numerals for every time, count and diff figure.",
+      "**Do** draw icons as inline line glyphs on a 24px grid with a 1.75px stroke, round caps and joins, at 14/16/20px.",
+      "**Do** show finished and draft PRs with a dashed, stopped clock instead of a lit one.",
+      "**Do** keep board surfaces at the resting shadow and change the border on hover.",
+      "**Do** honour `prefers-reduced-motion` by removing all transitions and animations."
+    ],
+    "donts": [
+      "**Don't** use emoji anywhere: in badges, states, labels or empty states.",
+      "**Don't** mark state with a coloured left stripe or edge band on cards; the clock carries state.",
+      "**Don't** use full-strength amber on the light board for anything that is not the user's clock.",
+      "**Don't** use solid flag red for anything but a fallen flag (past the danger threshold) and the active flag filter.",
+      "**Don't** add a second typeface or uppercase tracked labels.",
+      "**Don't** put lanes, filters or secondary information on the dark case."
+    ]
+  }
+}
