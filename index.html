@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -125,24 +125,24 @@ dialog::backdrop { background: rgba(9,30,66,.5); }
   <span class="status-line" id="status"></span>
   <span class="spacer"></span>
   <span class="me" id="me"></span>
-  <button id="btnRefresh" title="รีเฟรช (R)">⟳ รีเฟรช</button>
-  <button id="btnSettings">⚙️ ตั้งค่า</button>
+  <button id="btnRefresh" title="Refresh (R)">⟳ Refresh</button>
+  <button id="btnSettings">⚙️ Settings</button>
 </header>
 
 <div class="toolbar" id="toolbar" hidden>
-  <button class="chip fire" id="chipTurn" title="แสดงเฉพาะ PR ที่ถึงตาคุณ">🔥 ถึงตาคุณ <b id="cTurn">0</b></button>
-  <span class="chip danger" title="PR ที่ค้างในสถานะปัจจุบันเกินเกณฑ์ 'นานมาก'">⚠️ ค้างนาน <b id="cStale">0</b></span>
-  <span class="chip">🧑‍💻 ของฉัน <b id="cMine">0</b></span>
-  <span class="chip">👀 ที่ฉันรีวิว <b id="cReview">0</b></span>
+  <button class="chip fire" id="chipTurn" title="Show only PRs waiting on you">🔥 Your turn <b id="cTurn">0</b></button>
+  <span class="chip danger" title="PRs stuck in their current state longer than the 'stale' threshold">⚠️ Stale <b id="cStale">0</b></span>
+  <span class="chip">🧑‍💻 Mine <b id="cMine">0</b></span>
+  <span class="chip">👀 Reviewing <b id="cReview">0</b></span>
   <div class="filters">
     <select id="fRole" aria-label="role">
-      <option value="all">ทั้งหมด</option>
-      <option value="mine">PR ของฉัน</option>
-      <option value="review">PR ที่ฉันรีวิว</option>
+      <option value="all">All PRs</option>
+      <option value="mine">My PRs</option>
+      <option value="review">PRs I review</option>
     </select>
-    <select id="fRepo" aria-label="repo"><option value="">ทุก repo</option></select>
-    <input type="text" id="fQ" placeholder="ค้นหา ชื่อ / #เลข / คน" size="18">
-    <label><input type="checkbox" id="fSwim"> แยกแถวตาม role</label>
+    <select id="fRepo" aria-label="repo"><option value="">All repos</option></select>
+    <input type="text" id="fQ" placeholder="Search title / #number / person" size="18">
+    <label><input type="checkbox" id="fSwim"> Group by role</label>
   </div>
 </div>
 
@@ -153,35 +153,35 @@ dialog::backdrop { background: rgba(9,30,66,.5); }
 
 <dialog id="dlgSettings">
   <form method="dialog" id="settingsForm">
-    <div class="dlg-head"><h3>⚙️ ตั้งค่า</h3><button value="cancel" formnovalidate>✕</button></div>
+    <div class="dlg-head"><h3>⚙️ Settings</h3><button value="cancel" formnovalidate>✕</button></div>
     <div class="dlg-body form">
       <label>GitHub Personal Access Token
-        <input type="password" name="token" autocomplete="off" placeholder="ghp_... หรือ github_pat_...">
+        <input type="password" name="token" autocomplete="off" placeholder="ghp_... or github_pat_...">
         <span class="hint">
-          สร้างได้ที่ <a href="https://github.com/settings/tokens/new?scopes=repo&description=PR%20Monitor" target="_blank" rel="noopener">github.com/settings/tokens</a>
-          (classic token, scope <code>repo</code>) — ถ้า org ใช้ SSO ต้องกด “Configure SSO” → Authorize ด้วย
-          <br>Token เก็บใน browser นี้เท่านั้น (localStorage) และส่งไปที่ api.github.com เท่านั้น
+          Create one at <a href="https://github.com/settings/tokens/new?scopes=repo&description=PR%20Monitor" target="_blank" rel="noopener">github.com/settings/tokens</a>
+          (classic token, <code>repo</code> scope). If your org uses SSO, also click “Configure SSO” → Authorize.
+          <br>The token is stored only in this browser (localStorage) and is sent only to api.github.com.
         </span>
       </label>
-      <label>กรองเพิ่มเติม (GitHub search qualifiers)
-        <input type="text" name="extraQuery" placeholder="เช่น org:my-company หรือ repo:owner/name">
-        <span class="hint">เว้นว่าง = ทุก repo ที่ token เข้าถึงได้</span>
+      <label>Extra filter (GitHub search qualifiers)
+        <input type="text" name="extraQuery" placeholder="e.g. org:my-company or repo:owner/name">
+        <span class="hint">Leave empty to include every repo the token can access</span>
       </label>
       <div class="row">
-        <label>เริ่มเตือน (เหลือง) เมื่อค้างเกิน (ชม.)<input type="number" name="warnHours" min="1"></label>
-        <label>นานมาก (แดง) เมื่อค้างเกิน (ชม.)<input type="number" name="dangerHours" min="1"></label>
-        <label>Done แสดงย้อนหลัง (วัน)<input type="number" name="doneDays" min="0" max="90"></label>
-        <label>รีเฟรชอัตโนมัติทุก (นาที, 0 = ปิด)<input type="number" name="refreshMin" min="0"></label>
+        <label>Warn (yellow) after (hours)<input type="number" name="warnHours" min="1"></label>
+        <label>Stale (red) after (hours)<input type="number" name="dangerHours" min="1"></label>
+        <label>Show Done for the last (days)<input type="number" name="doneDays" min="0" max="90"></label>
+        <label>Auto-refresh every (minutes, 0 = off)<input type="number" name="refreshMin" min="0"></label>
       </div>
-      <label class="check"><input type="checkbox" name="includeAssigned"> รวม PR ที่ถูก assign ให้ฉัน (นอกจากถูกขอให้รีวิว)</label>
-      <label class="check"><input type="checkbox" name="ignoreBots"> ไม่นับรีวิว/คอมเมนต์จาก bot (เช่น Copilot, CodeRabbit) ในการจัด lane</label>
-      <label class="check"><input type="checkbox" name="notify"> แจ้งเตือน (browser notification) เมื่อมี PR ใหม่ที่ถึงตาคุณ</label>
+      <label class="check"><input type="checkbox" name="includeAssigned"> Include PRs assigned to me (not only review requests)</label>
+      <label class="check"><input type="checkbox" name="ignoreBots"> Ignore reviews/comments from bots (e.g. Copilot, CodeRabbit) when picking lanes</label>
+      <label class="check"><input type="checkbox" name="notify"> Browser notification when a new PR is waiting on you</label>
     </div>
     <div class="dlg-foot">
-      <button type="button" id="btnClearToken">ลบ token</button>
+      <button type="button" id="btnClearToken">Clear token</button>
       <span class="spacer" style="flex:1"></span>
-      <button value="cancel" formnovalidate>ยกเลิก</button>
-      <button value="save" class="primary">บันทึก</button>
+      <button value="cancel" formnovalidate>Cancel</button>
+      <button value="save" class="primary">Save</button>
     </div>
   </form>
 </dialog>
@@ -192,16 +192,16 @@ dialog::backdrop { background: rgba(9,30,66,.5); }
 /* ---------- Config ---------- */
 
 const LANES = [
-  { id: 'draft',    title: '📝 Draft',               desc: 'ยังไม่พร้อมให้รีวิว',                  color: '#8590a2' },
-  { id: 'waiting',  title: '👀 รอรีวิว',               desc: 'ยังไม่มีใครรีวิว / รอ reviewer',        color: '#579dff' },
-  { id: 'changes',  title: '🔧 ต้องแก้ไข',             desc: 'มีคอมเมนต์ / ขอแก้ ยังไม่ได้อัปเดต',     color: '#f87168' },
-  { id: 'updated',  title: '🔁 แก้แล้ว รอรีวิวซ้ำ',     desc: 'author อัปเดตหลังได้รับรีวิวแล้ว',      color: '#9f8fef' },
-  { id: 'approved', title: '✅ Approved',             desc: 'ได้ approve แล้ว พร้อม merge',          color: '#4bce97' },
-  { id: 'done',     title: '🎉 Done',                 desc: 'merged / closed ล่าสุด',               color: '#8590a2' },
+  { id: 'draft',    title: '📝 Draft',               desc: 'Not ready for review yet',                  color: '#8590a2' },
+  { id: 'waiting',  title: '👀 Awaiting review',      desc: 'No review yet / waiting on reviewers',        color: '#579dff' },
+  { id: 'changes',  title: '🔧 Changes requested',   desc: 'Feedback not addressed yet',     color: '#f87168' },
+  { id: 'updated',  title: '🔁 Updated, re-review',  desc: 'Author updated after feedback',      color: '#9f8fef' },
+  { id: 'approved', title: '✅ Approved',             desc: 'Approved, ready to merge',          color: '#4bce97' },
+  { id: 'done',     title: '🎉 Done',                 desc: 'Recently merged / closed',               color: '#8590a2' },
 ];
 const SWIMLANES = [
-  { id: 'mine',   title: '🧑‍💻 PR ของฉัน' },
-  { id: 'review', title: '👀 PR ที่ฉันต้องรีวิว / เคยรีวิว' },
+  { id: 'mine',   title: '🧑‍💻 My PRs' },
+  { id: 'review', title: '👀 PRs I need to review / have reviewed' },
 ];
 const DEFAULTS = {
   token: '', extraQuery: '', warnHours: 24, dangerHours: 72, doneDays: 7, refreshMin: 5,
@@ -234,14 +234,14 @@ const maxOf = (arr) => arr.reduce((m, x) => (x > m ? x : m), 0);
 function fmtDur(ms) {
   if (ms < 0) ms = 0;
   const m = Math.floor(ms / 60000);
-  if (m < 60) return `${m} นาที`;
+  if (m < 60) return `${m}m`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h} ชม.`;
+  if (h < 24) return `${h}h`;
   const d = Math.floor(h / 24), rh = h % 24;
-  return rh && d < 7 ? `${d} วัน ${rh} ชม.` : `${d} วัน`;
+  return rh && d < 7 ? `${d}d ${rh}h` : `${d}d`;
 }
-const ago = (t) => (t ? `${fmtDur(Date.now() - t)}ที่แล้ว` : '—');
-const fmtDate = (t) => (t ? new Date(t).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' }) : '—');
+const ago = (t) => (t ? `${fmtDur(Date.now() - t)} ago` : '—');
+const fmtDate = (t) => (t ? new Date(t).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : '—');
 
 function staleLevel(ms) {
   const h = ms / H;
@@ -300,8 +300,8 @@ async function gql(query, variables) {
     headers: { Authorization: `bearer ${settings.token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, variables }),
   });
-  if (res.status === 401) throw new Error('Token ไม่ถูกต้องหรือหมดอายุ (401) — ตรวจสอบในหน้าตั้งค่า');
-  if (res.status === 403) throw new Error('GitHub ปฏิเสธคำขอ (403) — อาจติด rate limit หรือ token ไม่มีสิทธิ์');
+  if (res.status === 401) throw new Error('Invalid or expired token (401). Check it in Settings.');
+  if (res.status === 403) throw new Error('GitHub refused the request (403). You may be rate-limited or the token lacks access.');
   if (!res.ok) throw new Error(`GitHub API error ${res.status}`);
   const j = await res.json();
   if (j.errors?.length) {
@@ -447,10 +447,10 @@ function analyze(n, me, src) {
   } else if (n.isDraft) {
     lane = 'draft'; turn = 'draft'; since = ts(n.createdAt);
   } else if (approved && awaitingAuthor.length === 0) {
-    lane = 'approved'; turn = 'author'; since = lastApprovalAt || ts(n.updatedAt); hint = 'พร้อม merge';
+    lane = 'approved'; turn = 'author'; since = lastApprovalAt || ts(n.updatedAt); hint = 'ready to merge';
   } else if (needsFix) {
     if (authorActedAt > lastFeedbackAt) { lane = 'updated'; turn = 'reviewers'; since = authorActedAt; }
-    else { lane = 'changes'; turn = 'author'; since = lastFeedbackAt; hint = 'แก้ตามรีวิว'; }
+    else { lane = 'changes'; turn = 'author'; since = lastFeedbackAt; hint = 'address review feedback'; }
   } else if (lastFeedbackAt && authorActedAt > lastFeedbackAt) {
     lane = 'updated'; turn = 'reviewers'; since = authorActedAt;
   } else {
@@ -464,20 +464,20 @@ function analyze(n, me, src) {
     if (requestedMe) {
       lane = my ? 'updated' : 'waiting'; turn = 'me';
       since = myRequestAt || teamRequestAt || readyAt;
-      hint = my ? 'ถูกขอให้รีวิวซ้ำ' : 'ถูกขอให้รีวิว';
+      hint = my ? 're-review requested' : 'review requested';
     } else if (my) {
       if (my.state === 'APPROVED') {
         if (turn === 'reviewers') turn = 'others';
-        hint = 'คุณ approve แล้ว';
+        hint = 'you approved';
       } else if (my.state === 'CHANGES_REQUESTED' || myUnresolved.length) {
         const updated = lastPushAt > my.lastAt || myUnresolved.some((t) => eq(t.lastBy, author) && t.lastAt > my.lastAt);
-        if (updated) { lane = 'updated'; turn = 'me'; since = Math.max(lastPushAt, lastAuthorReplyAt); hint = 'author แก้แล้ว — รีวิวซ้ำ'; }
-        else { lane = 'changes'; turn = 'author'; since = my.lastAt; hint = 'รอ author แก้ตามที่คุณรีวิว'; }
+        if (updated) { lane = 'updated'; turn = 'me'; since = Math.max(lastPushAt, lastAuthorReplyAt); hint = 'author updated, re-review'; }
+        else { lane = 'changes'; turn = 'author'; since = my.lastAt; hint = 'to address your review'; }
       } else if (turn === 'reviewers') {
-        turn = 'me'; hint = 'คุณคอมเมนต์แล้ว แต่ยังไม่ approve';
+        turn = 'me'; hint = 'you commented but have not approved';
       }
     } else if (turn === 'reviewers') {
-      turn = 'me'; hint = src.has('assigned') ? 'ถูก assign ให้คุณ' : 'รอคุณรีวิว';
+      turn = 'me'; hint = src.has('assigned') ? 'assigned to you' : 'waiting for your review';
     }
   } else if (isMine && turn === 'author') {
     turn = 'me';
@@ -502,16 +502,16 @@ function analyze(n, me, src) {
 /* ---------- Rendering ---------- */
 
 const STATE_ICON = { APPROVED: '✅', CHANGES_REQUESTED: '❌', COMMENTED: '💬', DISMISSED: '🚫' };
-const STATE_TEXT = { APPROVED: 'Approved', CHANGES_REQUESTED: 'ขอให้แก้', COMMENTED: 'คอมเมนต์', DISMISSED: 'Dismissed' };
-const CI_ICON = { SUCCESS: ['✓', 'ok', 'CI ผ่าน'], FAILURE: ['✗', 'bad', 'CI ไม่ผ่าน'], ERROR: ['✗', 'bad', 'CI error'], PENDING: ['●', 'pending', 'CI กำลังรัน'], EXPECTED: ['●', 'pending', 'CI รอผล'] };
+const STATE_TEXT = { APPROVED: 'Approved', CHANGES_REQUESTED: 'Changes requested', COMMENTED: 'Commented', DISMISSED: 'Dismissed' };
+const CI_ICON = { SUCCESS: ['✓', 'ok', 'CI passed'], FAILURE: ['✗', 'bad', 'CI failed'], ERROR: ['✗', 'bad', 'CI error'], PENDING: ['●', 'pending', 'CI running'], EXPECTED: ['●', 'pending', 'CI pending'] };
 
 function turnText(p) {
   switch (p.turn) {
-    case 'me': return `🔥 ถึงตาคุณ${p.hint ? ' · ' + p.hint : ''}`;
-    case 'author': return `⏳ รอ @${p.author} ${p.hint || 'แก้ไข'}`;
-    case 'reviewers': return '⏳ รอ reviewer';
-    case 'others': return `⏳ รอ reviewer คนอื่น · ${p.hint}`;
-    case 'draft': return p.isMine ? '✏️ งานของคุณ (draft)' : `✏️ @${p.author} ยังทำอยู่`;
+    case 'me': return `🔥 Your turn${p.hint ? ' · ' + p.hint : ''}`;
+    case 'author': return `⏳ Waiting on @${p.author} ${p.hint || 'to make changes'}`;
+    case 'reviewers': return '⏳ Waiting on reviewers';
+    case 'others': return `⏳ Waiting on other reviewers · ${p.hint}`;
+    case 'draft': return p.isMine ? '✏️ Your draft' : `✏️ @${p.author} still working on it`;
     default: return p.state === 'MERGED' ? '🟣 Merged' : '⚪ Closed';
   }
 }
@@ -521,10 +521,10 @@ function avatarImg(src, login, cls = '') {
 function reviewerChips(p) {
   const chips = p.reviewers.map((r) => {
     const icon = r.pending ? '⏳' : STATE_ICON[r.state] || '';
-    const label = `${r.login}: ${r.pending ? 'รอรีวิว' : STATE_TEXT[r.state] || ''}${r.bot ? ' (bot)' : ''}`;
+    const label = `${r.login}: ${r.pending ? 'review pending' : STATE_TEXT[r.state] || ''}${r.bot ? ' (bot)' : ''}`;
     return `<span class="rv" title="${esc(label)}">${avatarImg(r.avatar, label)}<span class="st">${icon}</span></span>`;
   });
-  chips.push(...p.teams.map((t) => `<span class="team" title="รอทีม ${esc(t)} รีวิว">⏳ @${esc(t)}</span>`));
+  chips.push(...p.teams.map((t) => `<span class="team" title="Waiting on team ${esc(t)}">⏳ @${esc(t)}</span>`));
   return chips.join('');
 }
 
@@ -535,20 +535,20 @@ function cardHTML(p) {
   const lvl = open && p.turn !== 'draft' ? staleLevel(waited) : '';
   const ageLabel = p.lane === 'done'
     ? `${p.state === 'MERGED' ? 'merged' : 'closed'} ${ago(p.closedAt)}`
-    : p.lane === 'draft' ? `เปิดมา ${fmtDur(now - p.createdAt)}` : `ค้าง ${fmtDur(waited)}`;
-  const meta = [`<span class="age ${lvl}" title="อยู่ในสถานะนี้ตั้งแต่ ${esc(fmtDate(p.since))}">⏱ ${ageLabel}</span>`];
-  if (open && p.lane !== 'draft') meta.push(`<span title="เปิดมาทั้งหมด">📅 ${fmtDur(now - p.createdAt)}</span>`);
+    : p.lane === 'draft' ? `open ${fmtDur(now - p.createdAt)}` : `waiting ${fmtDur(waited)}`;
+  const meta = [`<span class="age ${lvl}" title="In this state since ${esc(fmtDate(p.since))}">⏱ ${ageLabel}</span>`];
+  if (open && p.lane !== 'draft') meta.push(`<span title="Total time open">📅 ${fmtDur(now - p.createdAt)}</span>`);
   if (p.counted) {
     const done = p.counted - p.unresolved;
-    meta.push(`<span class="${p.unresolved ? 'pending' : 'ok'}" title="review threads ที่ resolve แล้ว / ทั้งหมด">💬 ${done}/${p.counted} resolved</span>`);
+    meta.push(`<span class="${p.unresolved ? 'pending' : 'ok'}" title="Resolved / total review threads">💬 ${done}/${p.counted} resolved</span>`);
   }
   if (p.ci && CI_ICON[p.ci]) { const [i, c, t] = CI_ICON[p.ci]; meta.push(`<span class="${c}" title="${t}">${i} CI</span>`); }
-  if (p.mergeable === 'CONFLICTING' && open) meta.push('<span class="bad" title="มี merge conflict">⚠ conflict</span>');
-  meta.push(`<span title="บรรทัดที่เปลี่ยน"><span class="ok">+${p.additions ?? 0}</span> <span class="bad">−${p.deletions ?? 0}</span></span>`);
+  if (p.mergeable === 'CONFLICTING' && open) meta.push('<span class="bad" title="Has merge conflicts">⚠ conflict</span>');
+  meta.push(`<span title="Lines changed"><span class="ok">+${p.additions ?? 0}</span> <span class="bad">−${p.deletions ?? 0}</span></span>`);
 
   return `<article class="card ${p.turn === 'me' ? 'turn-me' : ''}" data-id="${esc(p.id)}" tabindex="0">
     <div class="top"><span class="repo" title="${esc(p.repo)}">${esc(p.repo)} #${p.number}</span>
-      <span class="tag ${p.role}">${p.isMine ? 'ของฉัน' : '@' + esc(p.author)}</span></div>
+      <span class="tag ${p.role}">${p.isMine ? 'mine' : '@' + esc(p.author)}</span></div>
     <div class="title">${esc(p.title)}</div>
     <div class="turn ${p.turn === 'me' ? 'me' : ''}">${esc(turnText(p))}</div>
     <div class="meta">${meta.join('')}</div>
@@ -584,16 +584,16 @@ function render() {
   if (!settings.token && !state.demo) {
     $('#toolbar').hidden = true;
     main.innerHTML = `<div class="empty-state">
-      <h2>👋 ยินดีต้อนรับสู่ PR Monitor</h2>
-      <p>บอร์ดสำหรับติดตาม Pull Request บน GitHub ที่คุณ <b>สร้างเอง</b> หรือ <b>ถูกขอให้รีวิว</b> แบ่งเป็น lane ตามสถานะ
-      พร้อมบอกว่าตอนนี้ <b>ถึงตาใคร</b>, คอมเมนต์ resolve ไปกี่อัน และ <b>ค้างมานานแค่ไหน</b></p>
-      <p>เริ่มต้นด้วยการใส่ GitHub Personal Access Token (scope <code>repo</code>)</p>
-      <div class="actions"><button class="primary" data-act="settings">ตั้งค่า token</button><button data-act="demo">ดูตัวอย่าง (demo)</button></div>
+      <h2>👋 Welcome to PR Monitor</h2>
+      <p>A board for tracking GitHub pull requests you <b>authored</b> or were <b>asked to review</b>, grouped into lanes by status.
+      Each card shows <b>whose turn it is</b>, how many comments are resolved, and <b>how long it has been waiting</b>.</p>
+      <p>Get started by adding a GitHub Personal Access Token (<code>repo</code> scope).</p>
+      <div class="actions"><button class="primary" data-act="settings">Set token</button><button data-act="demo">Try the demo</button></div>
     </div>`;
     return;
   }
   $('#toolbar').hidden = false;
-  if (!state.prs.length && state.loading) { main.innerHTML = '<div class="empty-state"><span class="spin">⟳</span> กำลังโหลด PR...</div>'; return; }
+  if (!state.prs.length && state.loading) { main.innerHTML = '<div class="empty-state"><span class="spin">⟳</span> Loading PRs...</div>'; return; }
 
   const prs = filtered();
   const all = state.prs;
@@ -605,7 +605,7 @@ function render() {
 
   const repos = [...new Set(all.map((p) => p.repo))].sort();
   const sel = $('#fRepo');
-  sel.innerHTML = '<option value="">ทุก repo</option>' + repos.map((r) => `<option ${r === ui.repo ? 'selected' : ''}>${esc(r)}</option>`).join('');
+  sel.innerHTML = '<option value="">All repos</option>' + repos.map((r) => `<option ${r === ui.repo ? 'selected' : ''}>${esc(r)}</option>`).join('');
   $('#fRole').value = ui.role;
   $('#fSwim').checked = ui.swim;
   if ($('#fQ') !== document.activeElement) $('#fQ').value = ui.q;
@@ -628,15 +628,15 @@ function render() {
     }
   }
   html += '</div></div>';
-  if (!state.loading && !all.length && !state.error) html = '<div class="empty-state">🎉 ไม่มี PR ที่เกี่ยวข้องกับคุณตอนนี้</div>';
+  if (!state.loading && !all.length && !state.error) html = '<div class="empty-state">🎉 No PRs involving you right now</div>';
   main.innerHTML = html;
 }
 
 function renderHeader() {
   const me = state.me;
   $('#me').innerHTML = me ? `${avatarImg(me.avatarUrl, me.login, 'avatar')} ${esc(me.login)}${state.demo ? ' (demo)' : ''}` : '';
-  let s = state.loading ? '<span class="spin">⟳</span> กำลังโหลด...' : state.fetchedAt ? `อัปเดตล่าสุด ${new Date(state.fetchedAt).toLocaleTimeString('th-TH')}` : '';
-  if (state.rate && !state.loading) s += ` · API เหลือ ${state.rate.remaining}/${state.rate.limit}`;
+  let s = state.loading ? '<span class="spin">⟳</span> Loading...' : state.fetchedAt ? `Updated ${new Date(state.fetchedAt).toLocaleTimeString('en-US')}` : '';
+  if (state.rate && !state.loading) s += ` · API left ${state.rate.remaining}/${state.rate.limit}`;
   $('#status').innerHTML = s;
   const turns = state.prs.filter((p) => p.turn === 'me').length;
   document.title = turns ? `(${turns}) PR Monitor` : 'PR Monitor';
@@ -647,9 +647,9 @@ function renderBanners() {
   if (state.error) b.push(`<div class="banner error">⚠️ ${esc(state.error)}</div>`);
   if (state.warnings.length) {
     const sso = state.warnings.some((w) => /SAML|SSO/i.test(w));
-    b.push(`<div class="banner warn">บางส่วนโหลดไม่ได้: ${esc(state.warnings.slice(0, 2).join('; '))}${sso ? ' — ไปที่หน้า token แล้วกด “Configure SSO” เพื่อ authorize org' : ''}</div>`);
+    b.push(`<div class="banner warn">Some data could not be loaded: ${esc(state.warnings.slice(0, 2).join('; '))}${sso ? '. Open your token page and click “Configure SSO” to authorize the org.' : ''}</div>`);
   }
-  if (state.demo) b.push('<div class="banner warn">กำลังแสดงข้อมูลตัวอย่าง (demo) — กด ⚙️ ตั้งค่า เพื่อใส่ token และดู PR จริงของคุณ</div>');
+  if (state.demo) b.push('<div class="banner warn">Showing demo data. Open ⚙️ Settings and add a token to see your own PRs.</div>');
   $('#banners').innerHTML = b.join('');
 }
 
@@ -660,29 +660,29 @@ function showDetail(id) {
   const unresolved = p.threads.filter((t) => !t.resolved).sort((a, b) => a.createdAt - b.createdAt);
   const resolved = p.threads.length - unresolved.length;
   const facts = [
-    ['สถานะ', `${lane.title} · ${esc(turnText(p))}`],
-    ['อยู่ในสถานะนี้', p.lane === 'done' ? '—' : `${fmtDur(Date.now() - p.since)} (ตั้งแต่ ${fmtDate(p.since)})`],
-    ['เปิดเมื่อ', `${fmtDate(p.createdAt)} (${ago(p.createdAt)})`],
-    ['Push ล่าสุด', `${fmtDate(p.lastPushAt)} (${ago(p.lastPushAt)})`],
-    ['รีวิว/คอมเมนต์ล่าสุด', p.lastFeedbackAt ? `${fmtDate(p.lastFeedbackAt)} (${ago(p.lastFeedbackAt)})` : 'ยังไม่มี'],
-    ['Review threads', `${resolved}/${p.threads.length} resolved${p.awaitingAuthor ? ` · ${p.awaitingAuthor} รอ author ตอบ/แก้` : ''}${p.authorReplied ? ` · ${p.authorReplied} author ตอบแล้ว รอ reviewer` : ''}`],
-    ['คอมเมนต์ทั่วไป', p.comments],
+    ['Status', `${lane.title} · ${esc(turnText(p))}`],
+    ['Time in state', p.lane === 'done' ? '—' : `${fmtDur(Date.now() - p.since)} (since ${fmtDate(p.since)})`],
+    ['Opened', `${fmtDate(p.createdAt)} (${ago(p.createdAt)})`],
+    ['Last push', `${fmtDate(p.lastPushAt)} (${ago(p.lastPushAt)})`],
+    ['Last review/comment', p.lastFeedbackAt ? `${fmtDate(p.lastFeedbackAt)} (${ago(p.lastFeedbackAt)})` : 'None yet'],
+    ['Review threads', `${resolved}/${p.threads.length} resolved${p.awaitingAuthor ? ` · ${p.awaitingAuthor} waiting on author` : ''}${p.authorReplied ? ` · ${p.authorReplied} author replied, waiting on reviewer` : ''}`],
+    ['General comments', p.comments],
     ['Branch', `<code>${esc(p.head)}</code> → <code>${esc(p.base)}</code>`],
-    ['การเปลี่ยนแปลง', `<span class="ok">+${p.additions}</span> <span class="bad">−${p.deletions}</span> · ${p.changedFiles} ไฟล์ · ${p.commits} commits`],
-    ['CI / Merge', `${p.ci ? (CI_ICON[p.ci]?.[2] || p.ci) : 'ไม่มี CI'}${p.mergeable === 'CONFLICTING' ? ' · <span class="bad">มี conflict</span>' : ''}`],
+    ['Changes', `<span class="ok">+${p.additions}</span> <span class="bad">−${p.deletions}</span> · ${p.changedFiles} files · ${p.commits} commits`],
+    ['CI / Merge', `${p.ci ? (CI_ICON[p.ci]?.[2] || p.ci) : 'No CI'}${p.mergeable === 'CONFLICTING' ? ' · <span class="bad">Has conflicts</span>' : ''}`],
   ];
-  if (p.lane === 'done') facts.splice(1, 1, [p.state === 'MERGED' ? 'Merged' : 'Closed', `${fmtDate(p.closedAt)} · ใช้เวลา ${fmtDur(p.closedAt - p.createdAt)}`]);
+  if (p.lane === 'done') facts.splice(1, 1, [p.state === 'MERGED' ? 'Merged' : 'Closed', `${fmtDate(p.closedAt)} · took ${fmtDur(p.closedAt - p.createdAt)}`]);
 
   const reviewers = p.reviewers.map((r) => `<li>${avatarImg(r.avatar, r.login, 'avatar')}<div class="grow"><b>${esc(r.login)}</b>${r.bot ? ' <span class="tag">bot</span>' : ''}<br>
-    <span class="snippet">${r.state ? `${STATE_ICON[r.state]} ${STATE_TEXT[r.state]} · ${ago(r.lastAt)}` : 'ยังไม่ได้รีวิว'}${r.pending ? ` · ⏳ ถูกขอให้รีวิว${r.state ? 'ซ้ำ' : ''}` : ''}</span></div></li>`)
-    .concat(p.teams.map((t) => `<li>👥<div class="grow"><b>@${esc(t)}</b><br><span class="snippet">⏳ รอทีมรีวิว</span></div></li>`));
+    <span class="snippet">${r.state ? `${STATE_ICON[r.state]} ${STATE_TEXT[r.state]} · ${ago(r.lastAt)}` : 'Not reviewed yet'}${r.pending ? ` · ⏳ ${r.state ? 're-review' : 'review'} requested` : ''}</span></div></li>`)
+    .concat(p.teams.map((t) => `<li>👥<div class="grow"><b>@${esc(t)}</b><br><span class="snippet">⏳ Waiting on team review</span></div></li>`));
 
   const threadItems = unresolved.map((t) => {
-    const whose = eq(t.lastBy, p.author) ? `↩️ @${esc(p.author)} ตอบแล้ว รอ reviewer` : `⏳ รอ @${esc(p.author)} ตอบ/แก้`;
+    const whose = eq(t.lastBy, p.author) ? `↩️ @${esc(p.author)} replied, waiting on reviewer` : `⏳ Waiting on @${esc(p.author)}`;
     return `<li>${avatarImg(t.starterAvatar, t.starter, 'avatar')}<div class="grow">
       <div><b>${esc(t.starter || '?')}</b> · <code>${esc(t.path || '')}</code> · ${ago(t.createdAt)}${t.outdated ? ' · <span class="tag">outdated</span>' : ''}${t.starterBot ? ' · <span class="tag">bot</span>' : ''}</div>
       <div class="snippet">${esc(t.body)}</div>
-      <div class="snippet">${whose} · ${t.count} ข้อความ · ล่าสุด ${ago(t.lastAt)} · <a href="${esc(t.url)}" target="_blank" rel="noopener">เปิดดู ↗</a></div>
+      <div class="snippet">${whose} · ${t.count} messages · last ${ago(t.lastAt)} · <a href="${esc(t.url)}" target="_blank" rel="noopener">Open ↗</a></div>
     </div></li>`;
   });
 
@@ -692,8 +692,8 @@ function showDetail(id) {
       <button data-act="close">✕</button></div>
     <div class="dlg-body">
       <dl class="facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
-      <h4>Reviewers</h4>${reviewers.length ? `<ul class="list">${reviewers.join('')}</ul>` : '<div class="status-line">ยังไม่มี reviewer</div>'}
-      <h4>คอมเมนต์ที่ยังไม่ resolve (${unresolved.length})</h4>${threadItems.length ? `<ul class="list">${threadItems.join('')}</ul>` : '<div class="status-line">ไม่มี 🎉</div>'}
+      <h4>Reviewers</h4>${reviewers.length ? `<ul class="list">${reviewers.join('')}</ul>` : '<div class="status-line">No reviewers yet</div>'}
+      <h4>Unresolved comments (${unresolved.length})</h4>${threadItems.length ? `<ul class="list">${threadItems.join('')}</ul>` : '<div class="status-line">None 🎉</div>'}
     </div>`;
   dlg.showModal();
 }
@@ -724,7 +724,7 @@ function maybeNotify() {
   if (knownTurnIds && settings.notify && 'Notification' in window && Notification.permission === 'granted') {
     const fresh = state.prs.filter((p) => ids.has(p.id) && !knownTurnIds.has(p.id));
     for (const p of fresh.slice(0, 5)) {
-      const n = new Notification(`🔥 ถึงตาคุณ: ${p.repo} #${p.number}`, { body: `${p.title}\n${p.hint}`, tag: p.id });
+      const n = new Notification(`🔥 Your turn: ${p.repo} #${p.number}`, { body: `${p.title}\n${p.hint}`, tag: p.id });
       n.onclick = () => { window.focus(); showDetail(p.id); };
     }
   }
@@ -775,42 +775,42 @@ function loadDemo() {
     return { node, src: new Set(o.src || [author === 'you' ? 'authored' : 'requested']) };
   };
   const items = [
-    mk({ number: 412, title: 'WIP: ย้าย auth ไปใช้ OAuth2 PKCE', draft: true, age: 30, repo: 'acme/api' }),
-    mk({ number: 418, title: 'เพิ่มหน้า export รายงานเป็น CSV', age: 80, requests: ['alice', 'bob'], requested: [['alice', 80], ['bob', 80]] }),
-    mk({ number: 405, title: 'แก้ race condition ตอน refresh token', age: 120, pushH: 100, repo: 'acme/api', decision: 'CHANGES_REQUESTED',
+    mk({ number: 412, title: 'WIP: Move auth to OAuth2 PKCE', draft: true, age: 30, repo: 'acme/api' }),
+    mk({ number: 418, title: 'Add CSV export for reports', age: 80, requests: ['alice', 'bob'], requested: [['alice', 80], ['bob', 80]] }),
+    mk({ number: 405, title: 'Fix race condition on token refresh', age: 120, pushH: 100, repo: 'acme/api', decision: 'CHANGES_REQUESTED',
       reviews: [['alice', 'CHANGES_REQUESTED', 20], ['alice', 'COMMENTED', 19]],
       threads: [
-        { by: 'alice', h: 20, body: 'ตรงนี้ควรใช้ mutex ไม่งั้นจะยัง race อยู่', path: 'src/auth/refresh.ts' },
-        { by: 'alice', h: 19, body: 'ช่วยเพิ่ม test case ตอน token หมดอายุพร้อมกัน 2 request', path: 'test/refresh.test.ts' },
-        { by: 'alice', h: 20, body: 'ชื่อตัวแปรนี้สับสน', resolved: true, lastBy: 'you', lastH: 10 },
+        { by: 'alice', h: 20, body: 'This needs a mutex, otherwise it still races', path: 'src/auth/refresh.ts' },
+        { by: 'alice', h: 19, body: 'Please add a test for two requests hitting an expired token at once', path: 'test/refresh.test.ts' },
+        { by: 'alice', h: 20, body: 'This variable name is confusing', resolved: true, lastBy: 'you', lastH: 10 },
       ] }),
-    mk({ number: 399, title: 'ปรับ query dashboard ให้เร็วขึ้น (N+1)', age: 200, pushH: 6, decision: 'CHANGES_REQUESTED', repo: 'acme/web-app',
+    mk({ number: 399, title: 'Speed up dashboard queries (N+1)', age: 200, pushH: 6, decision: 'CHANGES_REQUESTED', repo: 'acme/web-app',
       reviews: [['bob', 'CHANGES_REQUESTED', 30]], requests: ['bob'], requested: [['bob', 6]],
       threads: [
-        { by: 'bob', h: 30, body: 'ยังมี N+1 ใน loop ของ orders', lastBy: 'you', lastH: 6, n: 2 },
-        { by: 'bob', h: 30, body: 'ใส่ index ที่ created_at ด้วย', resolved: true, lastBy: 'you', lastH: 6, n: 2 },
+        { by: 'bob', h: 30, body: 'Still an N+1 in the orders loop', lastBy: 'you', lastH: 6, n: 2 },
+        { by: 'bob', h: 30, body: 'Add an index on created_at too', resolved: true, lastBy: 'you', lastH: 6, n: 2 },
       ] }),
-    mk({ number: 377, title: 'อัปเกรด React เป็น v19', age: 150, pushH: 50, decision: 'APPROVED', reviews: [['carol', 'APPROVED', 8], ['bob', 'APPROVED', 12]],
-      threads: [{ by: 'carol', h: 40, body: 'เช็ค StrictMode ด้วย', resolved: true, lastBy: 'you', lastH: 30, n: 2 }] }),
-    mk({ number: 421, title: 'Dark mode สำหรับหน้า settings', age: 60, conflict: true, ci: 'FAILURE', requests: ['@frontend'], requested: [['@frontend', 60]] }),
-    mk({ number: 233, title: 'เพิ่ม rate limit ให้ public API', author: 'dave', age: 100, repo: 'acme/api', requests: ['you'], requested: [['you', 98]] }),
+    mk({ number: 377, title: 'Upgrade React to v19', age: 150, pushH: 50, decision: 'APPROVED', reviews: [['carol', 'APPROVED', 8], ['bob', 'APPROVED', 12]],
+      threads: [{ by: 'carol', h: 40, body: 'Check StrictMode as well', resolved: true, lastBy: 'you', lastH: 30, n: 2 }] }),
+    mk({ number: 421, title: 'Dark mode for the settings page', age: 60, conflict: true, ci: 'FAILURE', requests: ['@frontend'], requested: [['@frontend', 60]] }),
+    mk({ number: 233, title: 'Add rate limiting to the public API', author: 'dave', age: 100, repo: 'acme/api', requests: ['you'], requested: [['you', 98]] }),
     mk({ number: 240, title: 'Refactor payment service', author: 'erin', age: 70, repo: 'acme/payments', requests: ['you'], requested: [['you', 5]],
       reviews: [['you', 'CHANGES_REQUESTED', 40]], pushH: 6,
-      threads: [{ by: 'you', h: 40, body: 'ควรแยก retry logic ออกมา', lastBy: 'erin', lastH: 6, n: 2 }] }),
-    mk({ number: 245, title: 'เพิ่ม feature flag สำหรับ checkout ใหม่', author: 'frank', age: 90, src: ['reviewed'], pushH: 60,
+      threads: [{ by: 'you', h: 40, body: 'Retry logic should be extracted', lastBy: 'erin', lastH: 6, n: 2 }] }),
+    mk({ number: 245, title: 'Add feature flag for the new checkout', author: 'frank', age: 90, src: ['reviewed'], pushH: 60,
       reviews: [['you', 'CHANGES_REQUESTED', 50]], decision: 'CHANGES_REQUESTED',
       threads: [
-        { by: 'you', h: 50, body: 'flag นี้ต้อง default เป็น off', path: 'config/flags.yml' },
-        { by: 'you', h: 50, body: 'ลืมลบ console.log', path: 'src/checkout.tsx' },
+        { by: 'you', h: 50, body: 'This flag should default to off', path: 'config/flags.yml' },
+        { by: 'you', h: 50, body: 'Leftover console.log', path: 'src/checkout.tsx' },
       ] }),
-    mk({ number: 251, title: 'Migrate cron jobs ไป queue', author: 'gina', age: 40, src: ['reviewed'], repo: 'acme/api', pushH: 3,
-      reviews: [['you', 'COMMENTED', 20]], threads: [{ by: 'you', h: 20, body: 'ถ้า job fail จะ retry กี่ครั้ง?', lastBy: 'gina', lastH: 3, n: 2 }] }),
-    mk({ number: 260, title: 'ปรับ copy หน้า onboarding', author: 'hana', age: 30, src: ['reviewed'], requests: ['bob'], requested: [['bob', 30]],
+    mk({ number: 251, title: 'Migrate cron jobs to a queue', author: 'gina', age: 40, src: ['reviewed'], repo: 'acme/api', pushH: 3,
+      reviews: [['you', 'COMMENTED', 20]], threads: [{ by: 'you', h: 20, body: 'How many times do failed jobs retry?', lastBy: 'gina', lastH: 3, n: 2 }] }),
+    mk({ number: 260, title: 'Update onboarding copy', author: 'hana', age: 30, src: ['reviewed'], requests: ['bob'], requested: [['bob', 30]],
       reviews: [['you', 'APPROVED', 10], ['copilot[bot]', 'COMMENTED', 29]],
       threads: [{ by: 'copilot[bot]', h: 29, body: 'Consider extracting this string to i18n.' }] }),
-    mk({ number: 365, title: 'แก้ timezone ในรายงานรายเดือน', age: 200, state: 'MERGED', closedH: 20, reviews: [['alice', 'APPROVED', 30]], src: ['done'] }),
-    mk({ number: 228, title: 'ลบ endpoint v1 ที่ไม่ใช้แล้ว', author: 'dave', age: 300, repo: 'acme/api', state: 'MERGED', closedH: 50, reviews: [['you', 'APPROVED', 60]], src: ['done'] }),
-    mk({ number: 230, title: 'ทดลอง cache layer (ยกเลิก)', author: 'erin', age: 400, repo: 'acme/payments', state: 'CLOSED', closedH: 100, reviews: [['you', 'COMMENTED', 200]], src: ['done'] }),
+    mk({ number: 365, title: 'Fix timezone in monthly report', age: 200, state: 'MERGED', closedH: 20, reviews: [['alice', 'APPROVED', 30]], src: ['done'] }),
+    mk({ number: 228, title: 'Remove unused v1 endpoints', author: 'dave', age: 300, repo: 'acme/api', state: 'MERGED', closedH: 50, reviews: [['you', 'APPROVED', 60]], src: ['done'] }),
+    mk({ number: 230, title: 'Experiment: cache layer (abandoned)', author: 'erin', age: 400, repo: 'acme/payments', state: 'CLOSED', closedH: 100, reviews: [['you', 'COMMENTED', 200]], src: ['done'] }),
   ];
   state.prs = items.map(({ node, src }) => analyze(node, 'you', src));
   state.fetchedAt = Date.now();

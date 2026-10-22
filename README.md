@@ -1,55 +1,55 @@
 # 🗂️ PR Monitor
 
-บอร์ดแบบ Kanban (คล้าย Jira) สำหรับติดตาม Pull Request บน GitHub ที่คุณ **สร้างเอง** หรือ **ถูกขอให้รีวิว / ถูก assign**
-เป็นไฟล์ HTML ไฟล์เดียว (`index.html`) ไม่ต้องติดตั้งอะไร เปิดใน browser ได้เลย
+A Kanban-style board (like Jira) for tracking GitHub pull requests you **authored** or were **asked to review / assigned to**.
+It's a single HTML file (`index.html`) with nothing to install: just open it in a browser.
 
-## เริ่มใช้งาน
+## Getting started
 
-1. เปิด `index.html` ใน browser (ดับเบิลคลิก หรือ host บน GitHub Pages ก็ได้)
-2. กด **⚙️ ตั้งค่า** แล้วใส่ GitHub Personal Access Token
-   - สร้างที่ <https://github.com/settings/tokens/new?scopes=repo&description=PR%20Monitor> (classic token, scope `repo`)
-   - ถ้า org ใช้ SSO ให้กด **Configure SSO → Authorize** ให้ token ด้วย
-3. (ไม่บังคับ) ใส่ตัวกรองเพิ่ม เช่น `org:my-company` เพื่อดูเฉพาะ org งาน
+1. Open `index.html` in your browser (double-click it, or host it on GitHub Pages).
+2. Click **⚙️ Settings** and paste a GitHub Personal Access Token.
+   - Create one at <https://github.com/settings/tokens/new?scopes=repo&description=PR%20Monitor> (classic token, `repo` scope).
+   - If your org uses SSO, click **Configure SSO → Authorize** for the token.
+3. (Optional) Add an extra filter such as `org:my-company` to limit the board to your work org.
 
-อยากลองดูก่อนโดยไม่ใส่ token: กด **ดูตัวอย่าง (demo)** หรือเปิด `index.html?demo`
+To try it without a token, click **Try the demo** or open `index.html?demo`.
 
-> Token ถูกเก็บใน `localStorage` ของ browser เครื่องนั้นเท่านั้น และถูกส่งไปที่ `api.github.com` เท่านั้น
+> The token is stored only in that browser's `localStorage` and is sent only to `api.github.com`.
 
-## Lane
+## Lanes
 
-| Lane | ความหมาย |
+| Lane | Meaning |
 |---|---|
-| 📝 Draft | PR ยังเป็น draft |
-| 👀 รอรีวิว | ยังไม่มีใครรีวิว หรือรอ reviewer อยู่ |
-| 🔧 ต้องแก้ไข | มี reviewer ขอให้แก้ / มีคอมเมนต์ที่ยังไม่ resolve และ author ยังไม่ได้อัปเดต |
-| 🔁 แก้แล้ว รอรีวิวซ้ำ | author push โค้ด / ตอบคอมเมนต์ / ขอรีวิวซ้ำ หลังได้รับรีวิวแล้ว |
-| ✅ Approved | ได้ approve แล้ว ไม่มีคอมเมนต์ค้าง พร้อม merge |
-| 🎉 Done | merged / closed ภายใน N วันล่าสุด (ตั้งค่าได้) |
+| 📝 Draft | The PR is still a draft |
+| 👀 Awaiting review | No review yet, or waiting on reviewers |
+| 🔧 Changes requested | A reviewer requested changes or left unresolved comments, and the author hasn't updated yet |
+| 🔁 Updated, re-review | The author pushed code, replied, or re-requested review after getting feedback |
+| ✅ Approved | Approved with no open comments, ready to merge |
+| 🎉 Done | Merged / closed in the last N days (configurable) |
 
-บอร์ดแบ่งเป็น 2 แถว (swimlane): **PR ของฉัน** และ **PR ที่ฉันต้องรีวิว / เคยรีวิว**
-สำหรับ PR ที่คุณเป็น reviewer lane จะดูจากมุมของคุณ เช่น ถ้าคุณขอให้แก้แล้ว author ยังไม่ push → อยู่ใน “ต้องแก้ไข” (รอ author) แต่ถ้า author push แล้ว → ย้ายไป “แก้แล้ว รอรีวิวซ้ำ” และขึ้นว่า **🔥 ถึงตาคุณ**
+The board has two rows (swimlanes): **My PRs** and **PRs I need to review / have reviewed**.
+For PRs you review, the lane is from your point of view. For example, if you requested changes and the author hasn't pushed yet, the PR sits in "Changes requested" (waiting on the author). Once the author pushes, it moves to "Updated, re-review" and shows **🔥 Your turn**.
 
-## แต่ละการ์ดบอกอะไร
+## What each card shows
 
-- **🔥 ถึงตาคุณ / ⏳ รอใคร** — ตอนนี้ต้องรอใครทำอะไร
-- **⏱ ค้าง X วัน** — อยู่ในสถานะปัจจุบันมานานแค่ไหน (เหลือง/แดง เมื่อเกินเกณฑ์ที่ตั้งไว้ ค่าเริ่มต้น 24 ชม. / 72 ชม.)
-- **📅** — เปิด PR มานานเท่าไหร่
-- **💬 2/5 resolved** — จำนวน review thread ที่ resolve แล้ว
-- สถานะ CI, merge conflict, จำนวนบรรทัดที่เปลี่ยน
-- รูป reviewer พร้อมสถานะ: ✅ approve, ❌ ขอให้แก้, 💬 คอมเมนต์, ⏳ รอรีวิว
+- **🔥 Your turn / ⏳ Waiting on …**: who needs to act next
+- **⏱ waiting Xd**: how long the PR has been in its current state (turns yellow/red past your thresholds, 24h / 72h by default)
+- **📅**: how long the PR has been open
+- **💬 2/5 resolved**: resolved review threads out of the total
+- CI status, merge conflicts, and lines changed
+- Reviewer avatars with their state: ✅ approved, ❌ changes requested, 💬 commented, ⏳ review pending
 
-กดที่การ์ดเพื่อดูรายละเอียด: เวลา push/รีวิวล่าสุด, สถานะ reviewer แต่ละคน และ **รายการคอมเมนต์ที่ยังไม่ resolve** ว่ารอ author แก้ หรือ author ตอบแล้วรอ reviewer
+Click a card for details: last push and review times, each reviewer's status, and the **list of unresolved comments**, showing whether each is waiting on the author or the author replied and it's waiting on the reviewer.
 
-## ฟีเจอร์อื่นๆ
+## Other features
 
-- กรองตาม role / repo / ค้นหา, ปุ่ม **🔥 ถึงตาคุณ** เพื่อดูเฉพาะงานที่ต้องทำ
-- รีเฟรชอัตโนมัติ (ค่าเริ่มต้นทุก 5 นาที), กด `R` เพื่อรีเฟรช
-- จำนวน PR ที่ถึงตาคุณแสดงบน tab ของ browser และเปิดแจ้งเตือน (browser notification) ได้
-- ไม่นับรีวิวจาก bot (Copilot, CodeRabbit ฯลฯ) ในการจัด lane (ปิดได้ในตั้งค่า)
-- รองรับ dark mode และหน้าจอมือถือ
+- Filter by role, repo, or search text. The **🔥 Your turn** chip shows only PRs waiting on you.
+- Auto-refresh (every 5 minutes by default). Press `R` to refresh.
+- The number of PRs waiting on you shows in the browser tab title, and you can turn on browser notifications.
+- Reviews from bots (Copilot, CodeRabbit, etc.) are ignored when picking lanes (can be turned off in Settings).
+- Dark mode and mobile layout.
 
-## ข้อจำกัด
+## Limitations
 
-- ใช้ GitHub Search API: ดึงได้สูงสุด 100 PR ต่อประเภทการค้นหา
-- ถ้าถูกขอรีวิวผ่าน **ทีม** จะนับว่าเป็นของคุณด้วย
-- เวลา “push ล่าสุด” อ้างอิงจากเวลา commit และ event force-push
+- Uses the GitHub Search API: up to 100 PRs per search type.
+- Review requests sent to a **team** you belong to count as yours.
+- "Last push" is based on commit times and force-push events.
